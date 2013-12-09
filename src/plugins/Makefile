@@ -1,13 +1,16 @@
-
 CC=$(PREFIX)gcc
 CFLAGS=-Wall -Wno-unused-variable -Wno-unused-but-set-variable
 LDFLAGS=-lc -ldl
 INCLUDE=-I../include
 
-all: shell.so audio.so
+all: fb.so shell.so audio.so
 
 plugin.o: ../plugin.c
 	$(CC) $(CFLAGS) $(INCLUDE) -fPIC -c ../plugin.c
+
+fb.so: fb.c plugin.o
+	$(CC) $(CFLAGS) $(INCLUDE) -fPIC -c fb.c
+	$(CC) -shared -Wl,-soname,fb.so -o fb.so fb.o plugin.o
 
 shell.so: shell.c plugin.o
 	$(CC) $(CFLAGS) $(INCLUDE) -fPIC -c shell.c
@@ -19,3 +22,5 @@ audio.so: audio.c plugin.o
 
 clean:
 	rm -f *.o *.so
+
+.PHONY: all clean
