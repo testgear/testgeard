@@ -18,7 +18,7 @@ shell.so: shell.c plugin.o
 
 audio.so: audio.c plugin.o
 	$(CC) $(CFLAGS) $(INCLUDE) -fPIC -c audio.c
-	$(CC) -shared -Wl,-soname,shell.so -o audio.so audio.o plugin.o -lm -lasound
+	$(CC) -shared -Wl,-soname,shell.so -o audio.so audio.o plugin.o -lm -lasound -laudiofile
 
 clean:
 	rm -f *.o *.so
