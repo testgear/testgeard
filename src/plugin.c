@@ -314,8 +314,6 @@ char * describe(char *name)
 {
     int i;
 
-    printf("DESCRIBE(%s)\n", name);
-
     // First, check reserved variable words
     if (name[0] == 0)
         return (char *) plugin->description;

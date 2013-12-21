@@ -73,8 +73,6 @@ struct fb
 
 static int open_device(char *device_name)
 {
-    printf("%s\n", __func__);
-
     // Open framebuffer device
     fb.fd = open(device_name, O_RDWR);
     if (!fb.fd)
@@ -244,9 +242,6 @@ static void put_pattern(struct fb *fb, int pattern)
 static int fb_load(void)
 {
     // Action on load
-
-    printf("%s\n", __func__);
-    
     set_int("xres", 640);
     set_int("yres", 480);
     set_string("filename", "/tmp/test-pattern.png");
@@ -258,9 +253,6 @@ static int fb_load(void)
 static int fb_unload(void)
 {
     // Action on unload
-
-    printf("%s\n", __func__);
-
     printf(" xres=%d\n", get_int("xres"));
     printf(" yres=%d\n", get_int("yres"));
     printf(" filename=%s\n", get_string("filename"));
@@ -280,8 +272,6 @@ static int fb_set_resolution(void)
     char *device = get_string("device");
     int xres = get_int("xres");
     int yres = get_int("yres");
-
-    printf("%s\n", __func__);
 
     // Open fb device
     status = open_device(device);
@@ -323,8 +313,6 @@ static int fb_set_depth(void)
     int status;
     char *device = get_string("device");
     int depth = get_int("depth");
-
-    printf("%s\n", __func__);
 
     // Open fb device
     status = open_device(device);
@@ -414,9 +402,6 @@ static int fb_draw_pattern(void)
     char *device = get_string("device");
     int pattern = get_int("pattern");
 
-    printf("%s\n", __func__);
-    printf("pattern=%d\n", pattern);
-
     // Open fb device
     status = open_device(device);
     if (status != 0)
@@ -439,8 +424,6 @@ static int fb_show_image(void)
     int status;
     char *device = get_string("device");
     char *filename = get_string("filename");
-
-    printf("%s\n", __func__);
 
     // Open fb device
     status = open_device(device);
