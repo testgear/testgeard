@@ -60,6 +60,10 @@
 #define BLACK 0x000000
 #define WHITE 0xFFFFFF
 
+unsigned int red = BIT32_RED;
+unsigned int green = BIT32_GREEN;
+unsigned int blue = BIT32_BLUE;
+
 // Framebuffer configuration data
 struct fb
 {
@@ -183,18 +187,23 @@ static void put_pattern(struct fb *fb, int pattern)
     switch (pattern)
     {
         case 0:
+            // Solid red
             put_solid(fb, BIT32_RED);
             break;
         case 1:
+            // Solid green
             put_solid(fb, BIT32_GREEN);
             break;
         case 2:
+            // Solid blue
             put_solid(fb, BIT32_BLUE);
             break;
         case 3:
+            // Solid white
             put_solid(fb, WHITE);
             break;
         case 4:
+            // Solid black
             put_solid(fb, BLACK);
             break;
         default:
@@ -487,6 +496,7 @@ static struct plugin_var_table fb_vars[] =
     {   .name = "depth",
         .type = INT,
         .value = "32",
+//        .set = fb_depth_set,
         .description = "Color depth" },
 
     {   .name = "xoffset",
