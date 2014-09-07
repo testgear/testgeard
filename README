@@ -5,8 +5,8 @@
 1. Introduction
 
 This is the Test Gear device server which manages incoming connections, loads
-test plugins, and handles requests for manipulation of various test variables
-and running test commands.
+test plugins, and handles incoming requests to query/manage various test
+variables and running test commands.
 
 Each test plugin offers various variables (parameters) and commands (functions)
 which can be queried or fired from the Test Gear client.
@@ -19,7 +19,7 @@ testgeard includes code covered by the following licenses:
  * BSD-3, commonly known as the 3-clause (or "modified") BSD license
  * MIT, the MIT License 
 
-Please, check the source code for more details. A license is usually at the
+Please check the source code for more details. A license is usually at the
 start of each source file.
 
 The COPYING file (BSD-3) is the default license for code without an explicitly
