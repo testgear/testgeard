@@ -4,9 +4,9 @@
 
 1. Introduction
 
-    This is the Test Gear device server which manages incoming connections,
-    loads test plugins, and handles incoming requests to query/manage various
-    test variables and running test commands.
+    This is the Test Gear device server which manages incoming connections and
+    handles incoming requests to load/unload test plugins, query/manage various
+    test variables, and run test commands.
 
     Each test plugin offers various variables (parameters) and commands
     (functions) which can be queried or fired from the Test Gear client.
