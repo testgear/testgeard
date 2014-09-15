@@ -2,7 +2,7 @@
 # testgeard - Test Gear device server
 #
 
-VERSION=0.1alpha
+VERSION=0.2alpha
 
 CC=$(PREFIX)gcc
 CFLAGS=-Wall -DVERSION=\"$(VERSION)\" -DSERVER -Iinclude -Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable
