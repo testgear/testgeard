@@ -130,6 +130,8 @@
 
 static unsigned int message_counter = 0;
 
+static char error_message[4096] = "";
+
 struct __attribute__((__packed__)) msg_header_t
 {
    unsigned char prefix;
@@ -492,14 +494,15 @@ int submit_message(int handle,
             decode_value(payload, msg_header.payload_length, type, get_value);
         }
 
-        free(payload);
-
         if (msg_header.type == RSP_ERROR)
         {
             // Payload is the error string
-            tg_error = payload;
+            strcpy(error_message, payload);
+            tg_error = error_message;
             return -1;
         }
+
+        free(payload);
     }
 
     return 0;
