@@ -52,13 +52,17 @@
  *  message[10-*] = payload
  * 
  * Possible message types include:
+ *  LIST_PLUGINS,
  *  PLUGIN_LOAD, PLUGIN_UNLOAD,
+ *  PLUGIN_LIST_PROPERTIES,
  *  GET_CHAR, GET_SHORT, GET_INT, GET_FLOAT,
  *  SET_CHAR, SET_SHORT, SET_INT, SET_FLOAT,
  *  RSP_OK, RSP_ERROR
  *
  * Payload format depends on message type:
- *  PLUGIN_LOAD, PLUGIN_UNLOAD:
+ *  LIST_PLUGINS:
+ *   No payload (payload length = 0)
+ *  PLUGIN_LOAD, PLUGIN_UNLOAD, PLUGIN_LIST_PROPERTIES:
  *   payload[0]   = plugin name length
  *   payload[1-*] = plugin name
  *  GET_CHAR, GET_SHORT, GET_INT, GET_FLOAT, GET_STRING:
@@ -96,6 +100,10 @@
  *   payload[4-*] = response data
  *
  *  Data formats for RSP_OK response:
+ *  (LIST_PLUGINS):
+ *   data[0-N] = plugins string (N bytes)
+ *  (PLUGIN_LIST_PROPERTIES):
+ *   data[0-N] = plugin properties string (N bytes)
  *  (GET_CHAR):
  *   data[0] = value (1 byte)
  *  (GET_SHORT):
@@ -153,7 +161,7 @@ static int value_size(int command)
 
 static int create_message(void **msg_buffer,
                    char type,
-                   char *name,
+                   const char *name,
                    void *value,
                    int value_length,
                    unsigned int *id)
@@ -196,8 +204,12 @@ static int create_message(void **msg_buffer,
 
     switch (type)
     {
+        case LIST_PLUGINS:
+            message->payload_length = 0;
+            break;
         case PLUGIN_LOAD:
         case PLUGIN_UNLOAD:
+        case PLUGIN_LIST_PROPERTIES:
         case GET_CHAR:
         case GET_SHORT:
         case GET_INT:
@@ -233,7 +245,7 @@ static int create_message(void **msg_buffer,
             break;
         case SET_DATA:
         default:
-            perror("Error: Unknown message type");
+            printf("Error: Unknown message type\n");
             exit(-1);
             break;
     }
@@ -300,6 +312,12 @@ static int decode_value(void *payload, int payload_size, char type, void *value)
 
     switch (type)
     {
+        case LIST_PLUGINS:
+        case PLUGIN_LIST_PROPERTIES:
+            memcpy(value, payload, payload_size);
+            p = payload;
+            p[payload_size]=0;
+            break;
         case PLUGIN_LOAD:
         case PLUGIN_UNLOAD:
         case GET_CHAR:
@@ -357,10 +375,14 @@ static char *message_type(type)
 {
     switch (type)
     {
+        case LIST_PLUGINS:
+            return "LIST_PLUGINS";
         case PLUGIN_LOAD:
             return "PLUGIN_LOAD";
         case PLUGIN_UNLOAD:
             return "PLUGIN_UNLOAD";
+        case PLUGIN_LIST_PROPERTIES:
+            return "PLUGIN_LIST_PROPERTIES";
         case GET_CHAR:
             return "GET_CHAR";
         case GET_SHORT:
@@ -401,13 +423,13 @@ static char *message_type(type)
 #endif
 
 #ifndef SERVER
-int send_message(int handle,
-                 int type,
-                 char *name,
-                 void *get_value,
-                 void *set_value,
-                 int set_value_size,
-                 int timeout)
+int submit_message(int handle,
+                   int type,
+                   const char *name,
+                   void *get_value,
+                   void *set_value,
+                   int set_value_size,
+                   int timeout)
 {
     struct msg_header_t msg_header;
     char *response_message;
@@ -432,7 +454,7 @@ int send_message(int handle,
     }
 
     // Free request message buffer
-    // delete_message(message);
+    free(message);
 
     // Receive response message header
     if (tcp_read(&msg_header, MSG_HEADER_SIZE) == 0)
@@ -448,7 +470,7 @@ int send_message(int handle,
     if (msg_header.payload_length > 0)
     {
         // Allocate memory for payload buffer
-        payload = malloc(msg_header.payload_length);
+        payload = malloc(msg_header.payload_length + 1);
         if (payload == NULL)
         {
             perror("Error: malloc() failed");
@@ -460,6 +482,7 @@ int send_message(int handle,
         {
             printf("Server closed connection2\n");
             close(server_socket);
+            free(payload);
             exit(-1);
         }
 
@@ -468,6 +491,8 @@ int send_message(int handle,
             // Extract value from response message
             decode_value(payload, msg_header.payload_length, type, get_value);
         }
+
+        free(payload);
 
         if (msg_header.type == RSP_ERROR)
         {
@@ -523,9 +548,9 @@ int handle_incoming_message(int server_socket)
     char name[MSG_NAME_LENGTH_MAX];
     int response_type;
     int response_size = 0;
-    char response_value[256];
-    char plugin_name[256];
-    char variable_name[256];
+    char response_value[65536] = "";
+    char plugin_name[256] = "";
+    char variable_name[256] = "";
 
     /* 1. Receive message (blocking)
      * 1.1 Receive header length
@@ -548,30 +573,38 @@ int handle_incoming_message(int server_socket)
     // Verify message header
     verify_request(&msg_header);
 
-    // Allocate memory for payload buffer
-    payload = malloc(msg_header.payload_length);
-    if (payload == NULL)
+    if (msg_header.type != LIST_PLUGINS)
     {
-        perror("Error: malloc() failed");
-        return -1;
-    }
+        // Allocate memory for payload buffer
+        payload = malloc(msg_header.payload_length);
+        if (payload == NULL)
+        {
+            perror("Error: malloc() failed");
+            return -1;
+        }
 
-    // Receive payload
-    if (tcp_read(payload, msg_header.payload_length) == 0)
-    {
-        printf("Client closed connection\n");
-        close(client_socket);
-        exit(-1);
+        // Receive payload
+        if (tcp_read(payload, msg_header.payload_length) == 0)
+        {
+            printf("Client closed connection\n");
+            close(client_socket);
+            free(payload);
+            exit(-1);
+        }
     }
 
     debug_printf("Received message (id = %d, type = %s, payload size = %d)\n", msg_header.id, message_type(msg_header.type), msg_header.payload_length);
 
-    // Decode name part of payload (eg. "fb.xres")
-    decode_name(payload, &name);
+    if (msg_header.type != LIST_PLUGINS)
+    {
+        // Decode name part of payload (eg. "fb.xres")
+        decode_name(payload, &name);
+    }
 
-    // For all message types except plugin load/unload
+    // For all message types except plugin load/unload/list
     if ((msg_header.type != PLUGIN_LOAD) && 
-        (msg_header.type != PLUGIN_UNLOAD))
+        (msg_header.type != PLUGIN_UNLOAD) &&
+        (msg_header.type != LIST_PLUGINS))
     {
         // Decode plugin name and variable name
         decode_tg_string(name, (char *) &plugin_name, (char *) &variable_name);
@@ -580,13 +613,27 @@ int handle_incoming_message(int server_socket)
     // Decode message and execute request
     switch (msg_header.type)
     {
+        case LIST_PLUGINS:
+            debug_printf("LIST_PLUGINS()\n");
+            if (list_plugins((char *) &response_value))
+            {
+                response_type = RSP_ERROR;
+                sprintf(response_value, "Failed to list plugins");
+                response_size = strlen(response_value) + 1;
+            }
+            else
+            {
+                response_type = RSP_OK;
+                response_size = strlen(response_value);
+            }
+            break;
+
         case PLUGIN_LOAD:
             debug_printf("PLUGIN_LOAD(%s)\n", name);
             if (plugin_load(name))
             {
                 response_type = RSP_ERROR;
                 sprintf(response_value, "Failed to load %s plugin", name);
-                printf("response_size = %d\n", response_size);
                 response_size = strlen(response_value) + 1;
             }
             else
@@ -602,6 +649,20 @@ int handle_incoming_message(int server_socket)
             }
             else
                 response_type = RSP_OK;
+            break;
+        case PLUGIN_LIST_PROPERTIES:
+            debug_printf("PLUGIN_LIST_PROPERTIES()\n");
+            if (plugin_list_properties(plugin_name, (char *) &response_value))
+            {
+                response_type = RSP_ERROR;
+                sprintf(response_value, "Failed to list plugin properties");
+                response_size = strlen(response_value) + 1;
+            }
+            else
+            {
+                response_type = RSP_OK;
+                response_size = strlen(response_value);
+            }
             break;
         case GET_CHAR:
             debug_printf("GET_CHAR(%s)\n", name);
@@ -762,6 +823,10 @@ int handle_incoming_message(int server_socket)
          default:
             break;
     }
+
+    // Free payload memory
+    if (msg_header.type != LIST_PLUGINS)
+        free(payload);
 
     // Create response message
     length = create_message( (void *) &response_message, response_type, NULL, response_value, response_size, &id);

@@ -92,6 +92,34 @@ void register_plugin(struct plugin *plug)
     plug->init = &init;
 }
 
+int list_properties(char *properties)
+{
+    int i;
+    char buffer[256] = "";
+
+    // Traverse all variables
+    for (i=0; vars[i].name; i++)
+    {
+        sprintf(buffer, "%s:", vars[i].name);
+        strcat(properties, buffer);
+        sprintf(buffer, "%d,", vars[i].type);
+        strcat(properties, buffer);
+    }
+
+    buffer[0] = 0;
+
+    // Traverse all commands
+    for (i=0; commands[i].name; i++)
+    {
+        sprintf(buffer, "%s:%d,", commands[i].name, COMMAND);
+        strcat(properties, buffer);
+    }
+
+    properties[strlen(properties)-1] = 0;
+
+    return 0;
+}
+
 static int find_variable(char *name, int type)
 {
     int i;

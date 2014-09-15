@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013, Martin Lund
+ * Copyright (c) 2012-2014, Martin Lund
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor contributors may be 
+ * 3. Neither the name of the copyright holders nor contributors may be
  *    used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -33,8 +33,10 @@
 
 enum msg_type_t
 {
+    LIST_PLUGINS,
     PLUGIN_LOAD,
     PLUGIN_UNLOAD,
+    PLUGIN_LIST_PROPERTIES,
     GET_CHAR,
     SET_CHAR,
     GET_SHORT,
@@ -53,9 +55,9 @@ enum msg_type_t
     RSP_ERROR,
 };
 
-int send_message(int handle,
+int submit_message(int handle,
                  int type,
-                 char *name,
+                 const char *name,
                  void *get_value,
                  void *set_value,
                  int set_value_size,

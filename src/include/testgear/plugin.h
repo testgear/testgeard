@@ -47,7 +47,8 @@ enum var_type
    INT,
    FLOAT,
    STRING,
-   DATA
+   DATA,
+   COMMAND // TODO: rename var_type -> type (merge var and command types)
 };
 
 struct var_type_description_t

@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
+#include <errno.h>
 #include "testgear/plugin-manager.h"
 #include "testgear/plugin.h"
 #include "testgear/debug.h"
@@ -70,6 +71,33 @@ static void plugin_print_info(struct plugin *plugin)
         debug_printf_raw("%s ", plugin->vars[i].name);
     debug_printf_raw("\n");
     debug_printf("\n");
+}
+
+int list_plugins(char *plugins)
+{
+    FILE *fp;
+    char line_buffer[256];
+
+    fp = popen("cd plugins; ls *.so", "r");
+    if (fp == NULL)
+    {
+         printf("Error: %s\n", strerror(errno));
+         return -1;
+    }
+
+    while (fgets(line_buffer, 256, fp) != NULL)
+    {
+        int length = strlen(line_buffer);
+        line_buffer[length-1-3] = ',';
+        line_buffer[length-3] = 0;
+        strcat(plugins, line_buffer);
+    }
+
+    plugins[strlen(plugins)-1] = 0;
+
+    pclose(fp);
+
+    return 0;
 }
 
 int plugin_load(char *name)
@@ -234,6 +262,14 @@ void * get_symbol_handle(char *plugin_name, char *symbol)
     }
 
     return symbol_handle;
+}
+
+int plugin_list_properties(char *plugin_name, char *properties)
+{
+    int (*list__properties)(char *properties);
+
+    list__properties = get_symbol_handle(plugin_name, "list_properties");
+    return (*list__properties)(properties);
 }
 
 int plugin_get_char(char *plugin_name, char *variable_name, char *value)

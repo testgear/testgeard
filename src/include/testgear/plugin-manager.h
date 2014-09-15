@@ -33,8 +33,12 @@
 
 void plugin_manager_start(void);
 
+int list_plugins(char *plugins);
+
 int plugin_load(char *name);
 int plugin_unload(char *name);
+
+int plugin_list_properties(char *plugin_name, char *properties);
 
 int plugin_get_char(char *plugin_name, char *variable_name, char *value);
 int plugin_set_char(char *plugin_name, char *variable_name, char value);
