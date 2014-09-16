@@ -331,7 +331,7 @@ int plugin_set_char(char *plugin_name, char *variable_name, char value)
 
 int plugin_set_short(char *plugin_name, char *variable_name, short value)
 {
-    int (*set_short)(char *name, char value);
+    int (*set_short)(char *name, short value);
 
     set_short = get_symbol_handle(plugin_name, "set_short");
     return (*set_short)(variable_name, value);
