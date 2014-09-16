@@ -184,6 +184,17 @@ char get_char(char *name)
     return -1;
 }
 
+int set_char(char *name, char value)
+{
+    int i = find_variable(name, CHAR);
+    if (i >= 0)
+    {
+        *((char *)vars[i].data) = value;
+        return 0;
+    }
+
+    return -1;
+}
 
 int get__short(char *name, short *value)
 {
@@ -204,6 +215,18 @@ short get_short(char *name)
 
     if (get__short(name, &value) == 0)
         return value;
+
+    return -1;
+}
+
+int set_short(char *name, short value)
+{
+    int i = find_variable(name, SHORT);
+    if (i >= 0)
+    {
+        *((short *)vars[i].data) = value;
+        return 0;
+    }
 
     return -1;
 }
@@ -262,6 +285,18 @@ float get_float(char *name)
 
     if (get__float(name, &value) == 0)
         return value;
+
+    return -1;
+}
+
+int set_float(char *name, float value)
+{
+    int i = find_variable(name, FLOAT);
+    if (i >= 0)
+    {
+        *((float *)vars[i].data) = value;
+        return 0;
+    }
 
     return -1;
 }
