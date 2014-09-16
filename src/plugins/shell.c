@@ -54,7 +54,7 @@ static int shell_command(void)
 // Plugin commands
 static struct plugin_command_table shell_commands[] =
 {
-    {   .name = "command",
+    {   .name = "run",
         .function = shell_command,
         .description = "Run command" },
 
