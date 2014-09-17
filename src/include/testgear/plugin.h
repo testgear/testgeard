@@ -45,7 +45,9 @@ enum var_type
    CHAR,
    SHORT,
    INT,
+   LONG,
    FLOAT,
+   DOUBLE,
    STRING,
    DATA,
    COMMAND // TODO: rename var_type -> type (merge var and command types)
@@ -93,14 +95,18 @@ void register_plugin(struct plugin *plugin);
 int set_char(char *name, char value);
 int set_short(char *name, short value);
 int set_int(char *name, int value);
+int set_long(char *name, long value);
 int set_float(char *name, float value);
+int set_double(char *name, double value);
 int set_string(char *name, char *value);
 int set_data(char *name, void *value);
 
 char   get_char(char *name);
 short  get_short(char *name);
 int    get_int(char *name);
+long   get_long(char *name);
 float  get_float(char *name);
+double get_double(char *name);
 char * get_string(char *name);
 void * get_data(void *name);
 

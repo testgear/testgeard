@@ -296,12 +296,28 @@ int plugin_get_int(char *plugin_name, char *variable_name, int *value)
     return (*get__int)(variable_name, value);
 }
 
+int plugin_get_long(char *plugin_name, char *variable_name, long *value)
+{
+    int (*get__long)(char *name, long *value);
+
+    get__long = get_symbol_handle(plugin_name, "get__long");
+    return (*get__long)(variable_name, value);
+}
+
 int plugin_get_float(char *plugin_name, char *variable_name, float *value)
 {
     int (*get__float)(char *name, float *value);
 
     get__float = get_symbol_handle(plugin_name, "get__float");
     return (*get__float)(variable_name, value);
+}
+
+int plugin_get_double(char *plugin_name, char *variable_name, double *value)
+{
+    int (*get__double)(char *name, double *value);
+
+    get__double = get_symbol_handle(plugin_name, "get__double");
+    return (*get__double)(variable_name, value);
 }
 
 int plugin_get_string(char *plugin_name, char *variable_name, char *value)
@@ -345,12 +361,28 @@ int plugin_set_int(char *plugin_name, char *variable_name, int value)
     return (*set_int)(variable_name, value);
 }
 
+int plugin_set_long(char *plugin_name, char *variable_name, long value)
+{
+    int (*set_long)(char *name, long value);
+
+    set_long = get_symbol_handle(plugin_name, "set_long");
+    return (*set_long)(variable_name, value);
+}
+
 int plugin_set_float(char *plugin_name, char *variable_name, float value)
 {
     int (*set_float)(char *name, float value);
 
     set_float = get_symbol_handle(plugin_name, "set_float");
     return (*set_float)(variable_name, value);
+}
+
+int plugin_set_double(char *plugin_name, char *variable_name, double value)
+{
+    int (*set_double)(char *name, double value);
+
+    set_double = get_symbol_handle(plugin_name, "set_double");
+    return (*set_double)(variable_name, value);
 }
 
 int plugin_set_string(char *plugin_name, char *variable_name, char *value)

@@ -70,10 +70,20 @@ static struct plugin_var_table dummy_vars[] =
         .value = "",
         .description = "Test int 0" },
 
+    {   .name = "long0",
+        .type = LONG,
+        .value = "",
+        .description = "Test long 0" },
+
     {   .name = "float0",
         .type = FLOAT,
         .value = "",
         .description = "Test float 0" },
+
+    {   .name = "double0",
+        .type = DOUBLE,
+        .value = "",
+        .description = "Test double 0" },
 
     {   .name = "string0",
         .type = STRING,

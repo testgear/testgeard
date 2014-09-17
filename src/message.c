@@ -55,8 +55,8 @@
  *  LIST_PLUGINS,
  *  PLUGIN_LOAD, PLUGIN_UNLOAD,
  *  PLUGIN_LIST_PROPERTIES,
- *  GET_CHAR, GET_SHORT, GET_INT, GET_FLOAT,
- *  SET_CHAR, SET_SHORT, SET_INT, SET_FLOAT,
+ *  GET_CHAR, GET_SHORT, GET_INT, GET_LONG, GET_FLOAT, GET_DOUBLE
+ *  SET_CHAR, SET_SHORT, SET_INT, SET_LONG, SET_FLOAT, SET_DOUBLE
  *  RSP_OK, RSP_ERROR
  *
  * Payload format depends on message type:
@@ -65,7 +65,8 @@
  *  PLUGIN_LOAD, PLUGIN_UNLOAD, PLUGIN_LIST_PROPERTIES:
  *   payload[0]   = plugin name length
  *   payload[1-*] = plugin name
- *  GET_CHAR, GET_SHORT, GET_INT, GET_FLOAT, GET_STRING:
+ *  GET_CHAR, GET_SHORT, GET_INT, GET_LONG,
+ *  GET_FLOAT, GET_DOUBLE, GET_STRING:
  *   payload[0]   = variable name length
  *   payload[1-*] = variable name
  *  SET_CHAR:
@@ -80,10 +81,18 @@
  *   payload[0]   = variable name length
  *   payload[1-*] = variable name
  *   payload[*-*] = value (4 bytes)
+ *  SET_LONG:
+ *   payload[0]   = variable name length
+ *   payload[1-*] = variable name
+ *   payload[*-*] = value (8 bytes)
  *  SET_FLOAT:
  *   payload[0]   = variable name length
  *   payload[1-*] = variable name
  *   payload[*-*] = value (4 bytes)
+ *  SET_DOUBLE:
+ *   payload[0]   = variable name length
+ *   payload[1-*] = variable name
+ *   payload[*-*] = value (8 bytes)
  *  SET_STRING:
  *   payload[0]   = variable name length
  *   payload[1-*] = variable name
@@ -110,8 +119,12 @@
  *   data[0-1] = value (2 bytes)
  *  (GET_INT):
  *   data[0-3] = value (4 bytes)
+ *  (GET_LONG):
+ *   data[0-7] = value (8 bytes)
  *  (GET_FLOAT):
  *   data[0-4] = value (4 bytes)
+ *  (GET_DOUBLE):
+ *   data[0-7] = value (8 bytes)
  *  (GET_STRING):
  *   data[0-N] = string (N bytes)
  *  (RUN):
@@ -151,8 +164,12 @@ static int value_size(int command)
             return sizeof(short);
         case GET_INT:
             return sizeof(int);
+        case GET_LONG:
+            return sizeof(long);
         case GET_FLOAT:
             return sizeof(float);
+        case GET_DOUBLE:
+            return sizeof(double);
         default:
             return 0;
             break;
@@ -215,7 +232,9 @@ static int create_message(void **msg_buffer,
         case GET_CHAR:
         case GET_SHORT:
         case GET_INT:
+        case GET_LONG:
         case GET_FLOAT:
+        case GET_DOUBLE:
         case GET_STRING:
         case GET_DATA:
         case RUN:
@@ -227,7 +246,9 @@ static int create_message(void **msg_buffer,
         case SET_CHAR:
         case SET_SHORT:
         case SET_INT:
+        case SET_LONG:
         case SET_FLOAT:
+        case SET_DOUBLE:
             payload[0] = name_length;
             strcpy(&payload[1], name);
             memcpy(&payload[1+name_length], value, value_length);
@@ -331,8 +352,14 @@ static int decode_value(void *payload, int payload_size, char type, void *value)
         case GET_INT:
             memcpy(value, payload, sizeof(int));
             break;
+        case GET_LONG:
+            memcpy(value, payload, sizeof(long));
+            break;
         case GET_FLOAT:
             memcpy(value, payload, sizeof(float));
+            break;
+        case GET_DOUBLE:
+            memcpy(value, payload, sizeof(double));
             break;
         case GET_STRING:
             memcpy(value, payload, payload_size);
@@ -391,8 +418,12 @@ static char *message_type(type)
             return "GET_SHORT";
         case GET_INT:
             return "GET_INT";
+        case GET_LONG:
+            return "GET_LONG";
         case GET_FLOAT:
             return "GET_FLOAT";
+        case GET_DOUBLE:
+            return "GET_DOUBLE";
         case GET_STRING:
             return "GET_STRING";
         case GET_DATA:
@@ -403,8 +434,12 @@ static char *message_type(type)
             return "SET_SHORT";
         case SET_INT:
             return "SET_INT";
+        case SET_LONG:
+            return "SET_LONG";
         case SET_FLOAT:
             return "SET_FLOAT";
+        case SET_DOUBLE:
+            return "SET_DOUBLE";
         case SET_STRING:
             return "SET_STRING";
         case SET_DATA:
@@ -709,6 +744,20 @@ int handle_incoming_message(int server_socket)
                 response_size = strlen(response_value) + 1;
             }
             break;
+        case GET_LONG:
+            debug_printf("GET_LONG(%s)\n", name);
+            if (plugin_get_long(plugin_name, variable_name, (long *) response_value) == 0)
+            {
+                response_type = RSP_OK;
+                response_size = sizeof(long);
+            }
+            else
+            {
+                response_type = RSP_ERROR;
+                sprintf(response_value, "Variable %s of long type not found", name);
+                response_size = strlen(response_value) + 1;
+            }
+            break;
         case GET_FLOAT:
             debug_printf("GET_SHORT(%s)\n", name);
             if (plugin_get_float(plugin_name, variable_name, (float *) response_value) == 0)
@@ -720,6 +769,20 @@ int handle_incoming_message(int server_socket)
             {
                 response_type = RSP_ERROR;
                 sprintf(response_value, "Variable %s of float type not found", name);
+                response_size = strlen(response_value) + 1;
+            }
+            break;
+        case GET_DOUBLE:
+            debug_printf("GET_DOUBLE(%s)\n", name);
+            if (plugin_get_double(plugin_name, variable_name, (double *) response_value) == 0)
+            {
+                response_type = RSP_OK;
+                response_size = sizeof(double);
+            }
+            else
+            {
+                response_type = RSP_ERROR;
+                sprintf(response_value, "Variable %s of double type not found", name);
                 response_size = strlen(response_value) + 1;
             }
             break;
@@ -772,6 +835,18 @@ int handle_incoming_message(int server_socket)
                 response_size = strlen(response_value) + 1;
             }
             break;
+        case SET_LONG:
+            debug_printf("SET_LONG(%s)\n", name);
+            long *long_value = (long *) &payload[strlen(name)+1];
+            if (plugin_set_long(plugin_name, variable_name, *long_value) == 0)
+                response_type = RSP_OK;
+            else
+            {
+                response_type = RSP_ERROR;
+                sprintf(response_value, "Variable %s of long type not found", name);
+                response_size = strlen(response_value) + 1;
+            }
+            break;
         case SET_FLOAT:
             debug_printf("SET_FLOAT(%s)\n", name);
             float *float_value = (float *) &payload[strlen(name)+1];
@@ -780,7 +855,19 @@ int handle_incoming_message(int server_socket)
             else
             {
                 response_type = RSP_ERROR;
-                sprintf(response_value, "Variable %s of int type not found", name);
+                sprintf(response_value, "Variable %s of float type not found", name);
+                response_size = strlen(response_value) + 1;
+            }
+            break;
+        case SET_DOUBLE:
+            debug_printf("SET_DOUBLE(%s)\n", name);
+            double *double_value = (double *) &payload[strlen(name)+1];
+            if (plugin_set_double(plugin_name, variable_name, *double_value) == 0)
+                response_type = RSP_OK;
+            else
+            {
+                response_type = RSP_ERROR;
+                sprintf(response_value, "Variable %s of double type not found", name);
                 response_size = strlen(response_value) + 1;
             }
             break;

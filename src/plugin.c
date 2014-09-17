@@ -59,9 +59,17 @@ static void initialize_vars(struct plugin_var_table *vars)
                     vars[i].data = malloc(sizeof(int));
                     *((int *)vars[i].data) = atoi(vars[i].value);
                     break;
+                case LONG:
+                    vars[i].data = malloc(sizeof(long));
+                    *((long *)vars[i].data) = atol(vars[i].value);
+                    break;
                 case FLOAT:
                     vars[i].data = malloc(sizeof(float));
                     *((float *)vars[i].data) = strtof(vars[i].value, NULL);
+                    break;
+                case DOUBLE:
+                    vars[i].data = malloc(sizeof(double));
+                    *((double *)vars[i].data) = strtod(vars[i].value, NULL);
                     break;
                 case STRING:
                     vars[i].data = malloc(strlen(vars[i].value));
@@ -266,6 +274,41 @@ int set_int(char *name, int value)
     return -1;
 }
 
+int get__long(char *name, long *value)
+{
+    int i = find_variable(name, LONG);
+    if (i >= 0)
+    {
+        *value = *((long *)vars[i].data);
+        return 0;
+    }
+
+    printf("Warning: Variable %s not found\n", name);
+    return -1;
+}
+
+long get_long(char *name)
+{
+    long value;
+
+    if (get__long(name, &value) == 0)
+        return value;
+
+    return -1;
+}
+
+int set_long(char *name, long value)
+{
+    int i = find_variable(name, LONG);
+    if (i >= 0)
+    {
+        *((long *)vars[i].data) = value;
+        return 0;
+    }
+
+    return -1;
+}
+
 int get__float(char *name, float *value)
 {
     int i = find_variable(name, FLOAT);
@@ -295,6 +338,41 @@ int set_float(char *name, float value)
     if (i >= 0)
     {
         *((float *)vars[i].data) = value;
+        return 0;
+    }
+
+    return -1;
+}
+
+int get__double(char *name, double *value)
+{
+    int i = find_variable(name, DOUBLE);
+    if (i >= 0)
+    {
+        *value = *((double *)vars[i].data);
+        return 0;
+    }
+
+    printf("Warning: Variable %s not found\n", name);
+    return -1;
+}
+
+double get_double(char *name)
+{
+    double value;
+
+    if (get__double(name, &value) == 0)
+        return value;
+
+    return -1;
+}
+
+int set_double(char *name, double value)
+{
+    int i = find_variable(name, DOUBLE);
+    if (i >= 0)
+    {
+        *((double *)vars[i].data) = value;
         return 0;
     }
 

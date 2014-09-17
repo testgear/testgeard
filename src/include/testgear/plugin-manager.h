@@ -49,8 +49,14 @@ int plugin_set_short(char *plugin_name, char *variable_name, short value);
 int plugin_get_int(char *plugin_name, char *variable_name, int *value);
 int plugin_set_int(char *plugin_name, char *variable_name, int value);
 
+int plugin_get_long(char *plugin_name, char *variable_name, long *value);
+int plugin_set_long(char *plugin_name, char *variable_name, long value);
+
 int plugin_get_float(char *plugin_name, char *variable_name, float *value);
 int plugin_set_float(char *plugin_name, char *variable_name, float value);
+
+int plugin_get_double(char *plugin_name, char *variable_name, double *value);
+int plugin_set_double(char *plugin_name, char *variable_name, double value);
 
 int plugin_get_string(char *plugin_name, char *variable_name, char *value);
 int plugin_set_string(char *plugin_name, char *variable_name, char *value);
