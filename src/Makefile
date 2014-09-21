@@ -16,7 +16,6 @@ debug: all
 objects = main.o \
           plugin-manager.o \
           connection-manager.o \
-          command-manager.o \
           tcp.o \
           options.o \
           daemon.o \

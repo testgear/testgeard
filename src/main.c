@@ -54,7 +54,5 @@ int main(int argc, char *argv[])
     // Start connection manager
     start_connection_manager();
 
-    // Start command manager
-
     return 0;
 }
