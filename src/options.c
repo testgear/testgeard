@@ -39,6 +39,14 @@
 #include <getopt.h>
 #include "testgear/config.h"
 
+struct config_t config =
+{
+    false,
+    RUNNING,
+    8000
+};
+
+
 void print_options_help(char *argv[])
 {
     printf("Usage: %s [options]\n", argv[0]);
@@ -90,7 +98,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'z':
-                config.daemon = TRUE;
+                config.daemon = true;
                 break;
 
             case 'v':

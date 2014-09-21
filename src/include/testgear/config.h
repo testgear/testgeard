@@ -31,21 +31,19 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define TRUE	1
-#define FALSE	0
+#include <stdbool.h>
 
 #define STOPPED 0
 #define RUNNING 1
 
 /* Configuration */
-static struct {
+struct config_t
+{
     int    daemon; // Daemonize yes/no
     int    state;
     int    port;   // TCP server listen port
-} config = {
-    0,
-    RUNNING,
-    8000
 };
+
+extern struct config_t config;
 
 #endif
