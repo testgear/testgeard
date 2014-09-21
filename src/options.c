@@ -52,12 +52,12 @@ void print_options_help(char *argv[])
     printf("Usage: %s [options]\n", argv[0]);
     printf("\n");
     printf("Options:\n");
-    printf(" --connection <connection>  Connection type ('tcp' or 'serial')\n");
-    printf(" --device <device>          Serial device (eg. '/dev/ttyUSB1')\n");
-    printf(" --port <port>              TCP listen port (default is %d)\n", config.port);
-    printf(" --daemon                   Daemonize\n");
-    printf(" --version                  Display version\n");
-    printf(" --help                     Display help\n");
+    printf("  --connection <connection>  Connection type ('tcp' or 'serial')\n");
+    printf("  --device <device>          Serial device (eg. '/dev/ttyUSB1')\n");
+    printf("  --port <port>              TCP listen port (default is %d)\n", config.port);
+    printf("  --daemon                   Daemonize\n");
+    printf("  --version                  Display version\n");
+    printf("  --help                     Display help\n");
     printf("\n");
 }
 
@@ -102,7 +102,9 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'v':
-                printf("Test Gear v%s\n", VERSION);
+                printf("testgeard v%s\n", VERSION);
+                printf("Copyright (c) 2012-2014 Martin Lund\n\n");
+                printf("This is open source software. See README for license details.\n");
                 exit(0);
                 break;
 
