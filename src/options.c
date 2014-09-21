@@ -52,9 +52,9 @@ void print_options_help(char *argv[])
     printf("Usage: %s [options]\n", argv[0]);
     printf("\n");
     printf("Options:\n");
-    printf(" --connection=<connection>  Connection type ('tcp' or 'serial')\n");
-    printf(" --device=<device>          Serial device (eg. '/dev/ttyUSB1')\n");
-    printf(" --port=<port>              TCP listen port (default is %d)\n", config.port);
+    printf(" --connection <connection>  Connection type ('tcp' or 'serial')\n");
+    printf(" --device <device>          Serial device (eg. '/dev/ttyUSB1')\n");
+    printf(" --port <port>              TCP listen port (default is %d)\n", config.port);
     printf(" --daemon                   Daemonize\n");
     printf(" --version                  Display version\n");
     printf(" --help                     Display help\n");
