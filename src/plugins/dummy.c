@@ -39,12 +39,12 @@
 static int dummy_load(void)
 {
     // Set defaults
-    set_char("char0", 1);
-    set_short("short0", 2);
-    set_int("int0", 3);
-    set_long("long0", 4);
-    set_float("float0", 5);
-    set_double("double0", 6);
+    set_char("char0", 0);
+    set_short("short0", 0);
+    set_int("int0", 0);
+    set_long("long0", 0);
+    set_float("float0", 0.0);
+    set_double("double0", 0.0);
     set_string("string0", "Hi world!");
 
     return 0;
