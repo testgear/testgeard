@@ -1,0 +1,45 @@
+#
+# Bash completion script for testgeard.
+#
+
+_testgeard()
+{
+    local cur prev opts base
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    #  The options we'll complete.
+    opts="-c --connection \
+          -d --daemon \
+          -v --version \
+          -h --help"
+
+    #  Complete the options.
+    case "${prev}" in
+        -i | --connection)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -d | --daemon)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -v | --version)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        -h | --help)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;
+        *)
+        ;;
+    esac
+
+   COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+   return 0
+}
+
+# Bind completion to testgeard command
+complete -F _testgeard testgeard
