@@ -30,7 +30,7 @@
 
 #include "testgear/connection-manager.h"
 #include "testgear/tcp.h"
-#include "testgear/config.h"
+#include "testgear/options.h"
 
 void connection_manager_start(void)
 {
@@ -41,5 +41,5 @@ void connection_manager_start(void)
     // Serial device:
     //      /dev/USBtty0
 
-    tcp_server_start(config.port);
+    tcp_server_start(option.port);
 }

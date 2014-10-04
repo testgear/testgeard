@@ -37,9 +37,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <getopt.h>
-#include "testgear/config.h"
+#include "testgear/options.h"
 
-struct config_t config =
+struct option_t option =
 {
     false,
     RUNNING,
@@ -54,7 +54,7 @@ void print_options_help(char *argv[])
     printf("Options:\n");
     printf("  --connection <connection>  Connection type ('tcp' or 'serial')\n");
     printf("  --device <device>          Serial device (eg. '/dev/ttyUSB1')\n");
-    printf("  --port <port>              TCP listen port (default is %d)\n", config.port);
+    printf("  --port <port>              TCP listen port (default is %d)\n", option.port);
     printf("  --daemon                   Daemonize\n");
     printf("  --version                  Display version\n");
     printf("  --help                     Display help\n");
@@ -98,7 +98,7 @@ void parse_options(int argc, char *argv[])
                 break;
 
             case 'z':
-                config.daemon = true;
+                option.daemon = true;
                 break;
 
             case 'v':

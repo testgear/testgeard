@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include "testgear/options.h"
-#include "testgear/config.h"
 #include "testgear/debug.h"
 #include "testgear/daemon.h"
 #include "testgear/plugin-manager.h"
@@ -45,7 +44,7 @@ int main(int argc, char *argv[])
     parse_options(argc, argv);
 
     // Daemonize if requested
-    if (config.daemon)
+    if (option.daemon)
         daemonize();
 
     // Start plugin manager

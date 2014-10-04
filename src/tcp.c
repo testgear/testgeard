@@ -37,7 +37,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include "testgear/config.h"
+#include "testgear/options.h"
 #include "testgear/debug.h"
 #include "testgear/message.h"
 

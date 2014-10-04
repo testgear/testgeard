@@ -31,6 +31,21 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include <stdbool.h>
+
+#define STOPPED 0
+#define RUNNING 1
+
+/* Options */
+struct option_t
+{
+    int    daemon; // Daemonize yes/no
+    int    state;
+    int    port;   // TCP server listen port
+};
+
+extern struct option_t option;
+
 void print_options_help(char *argv[]);
 void parse_options(int argc, char *argv[]);
 
