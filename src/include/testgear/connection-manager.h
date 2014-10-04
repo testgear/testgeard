@@ -31,6 +31,6 @@
 #ifndef CONNECTION_MANAGER_H
 #define CONNECTION_MANAGER_H
 
-void start_connection_manager(void);
+void connection_manager_start(void);
 
 #endif

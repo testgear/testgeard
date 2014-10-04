@@ -32,7 +32,7 @@
 #include "testgear/tcp.h"
 #include "testgear/config.h"
 
-void start_connection_manager(void)
+void connection_manager_start(void)
 {
     // Start listen on connection types:
     //

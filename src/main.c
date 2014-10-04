@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     plugin_manager_start();
 
     // Start connection manager
-    start_connection_manager();
+    connection_manager_start();
 
     return 0;
 }
