@@ -34,55 +34,51 @@
 #include "testgear/plugin.h"
 
 static struct plugin *plugin;
-static struct plugin_var_table *vars;
-static struct plugin_command_table *commands;
+static struct plugin_var_table *var;
+static struct plugin_command_table *command;
 
-static void initialize_vars(struct plugin_var_table *vars)
+static void initialize_vars(struct plugin_var_table *var)
 {
     int i;
 
-    for (i=0; vars[i].name; i++)
+    for (i=0; var[i].name; i++)
     {
-        if (vars[i].value)
+        switch (var[i].type)
         {
-            switch (vars[i].type)
-            {
-                case CHAR:
-                    vars[i].data = malloc(sizeof(char));
-                    *((char *)vars[i].data) = atoi(vars[i].value);
-                    break;
-                case SHORT:
-                    vars[i].data = malloc(sizeof(short));
-                    *((short *)vars[i].data) = atoi(vars[i].value);
-                    break;
-                case INT:
-                    vars[i].data = malloc(sizeof(int));
-                    *((int *)vars[i].data) = atoi(vars[i].value);
-                    break;
-                case LONG:
-                    vars[i].data = malloc(sizeof(long));
-                    *((long *)vars[i].data) = atol(vars[i].value);
-                    break;
-                case FLOAT:
-                    vars[i].data = malloc(sizeof(float));
-                    *((float *)vars[i].data) = strtof(vars[i].value, NULL);
-                    break;
-                case DOUBLE:
-                    vars[i].data = malloc(sizeof(double));
-                    *((double *)vars[i].data) = strtod(vars[i].value, NULL);
-                    break;
-                case STRING:
-                    vars[i].data = malloc(strlen(vars[i].value));
-                    strcpy(vars[i].data, vars[i].value);
-                    break;
-                case DATA:
-                    vars[i].data = vars[i].value;
-                    break;
-                default:
-                    break;
-            }
-        } else
-            vars[i].data = NULL;
+            case CHAR:
+                var[i].data = malloc(sizeof(char));
+                *((char *)var[i].data) = 0;
+                break;
+            case SHORT:
+                var[i].data = malloc(sizeof(short));
+                *((short *)var[i].data) = 0;
+                break;
+            case INT:
+                var[i].data = malloc(sizeof(int));
+                *((int *)var[i].data) = 0;
+                break;
+            case LONG:
+                var[i].data = malloc(sizeof(long));
+                *((long *)var[i].data) = 0;
+                break;
+            case FLOAT:
+                var[i].data = malloc(sizeof(float));
+                *((float *)var[i].data) = 0;
+                break;
+            case DOUBLE:
+                var[i].data = malloc(sizeof(double));
+                *((double *)var[i].data) = 0;
+                break;
+            case STRING:
+                var[i].data = malloc(4);
+                strcpy(var[i].data, "");
+                break;
+            case DATA:
+                var[i].data = NULL;
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -95,8 +91,8 @@ int init(void)
 void register_plugin(struct plugin *plug)
 {
     plugin = plug;
-    vars = plug->vars;
-    commands = plug->commands;
+    var = plug->vars;
+    command = plug->commands;
     plug->init = &init;
 }
 
@@ -106,20 +102,20 @@ int list_properties(char *properties)
     char buffer[256] = "";
 
     // Traverse all variables
-    for (i=0; vars[i].name; i++)
+    for (i=0; var[i].name; i++)
     {
-        sprintf(buffer, "%s:", vars[i].name);
+        sprintf(buffer, "%s:", var[i].name);
         strcat(properties, buffer);
-        sprintf(buffer, "%d,", vars[i].type);
+        sprintf(buffer, "%d,", var[i].type);
         strcat(properties, buffer);
     }
 
     buffer[0] = 0;
 
     // Traverse all commands
-    for (i=0; commands[i].name; i++)
+    for (i=0; command[i].name; i++)
     {
-        sprintf(buffer, "%s:%d,", commands[i].name, COMMAND);
+        sprintf(buffer, "%s:%d,", command[i].name, COMMAND);
         strcat(properties, buffer);
     }
 
@@ -133,16 +129,16 @@ static int find_variable(char *name, int type)
     int i;
 
     // Find variable matching name
-    for (i=0; vars[i].name; i++)
+    for (i=0; var[i].name; i++)
     {
-        if (strcmp(name, vars[i].name) == 0)
+        if (strcmp(name, var[i].name) == 0)
         {
             if (type != -1)
             {
                 // Check matching type
-                if (vars[i].type != type)
+                if (var[i].type != type)
                 {
-                    printf("Warning: Variable has different type\n");
+                    printf("Warning: Variable %s has different type\n", var[i].name);
                     return -1;
                 }
             }
@@ -159,9 +155,9 @@ static int find_command(char *name)
     int i;
 
     // Find command matching name
-    for (i=0; commands[i].name; i++)
+    for (i=0; command[i].name; i++)
     {
-        if (strcmp(name, commands[i].name) == 0)
+        if (strcmp(name, command[i].name) == 0)
             return i;
     }
 
@@ -174,7 +170,7 @@ int get__char(char *name, char *value)
     int i = find_variable(name, CHAR);
     if (i >= 0)
     {
-        *value = *((char *)vars[i].data);
+        *value = *((char *)var[i].data);
         return 0;
     }
 
@@ -197,7 +193,7 @@ int set_char(char *name, char value)
     int i = find_variable(name, CHAR);
     if (i >= 0)
     {
-        *((char *)vars[i].data) = value;
+        *((char *)var[i].data) = value;
         return 0;
     }
 
@@ -209,7 +205,7 @@ int get__short(char *name, short *value)
     int i = find_variable(name, SHORT);
     if (i >= 0)
     {
-        *value = *((short *)vars[i].data);
+        *value = *((short *)var[i].data);
         return 0;
     }
 
@@ -232,7 +228,7 @@ int set_short(char *name, short value)
     int i = find_variable(name, SHORT);
     if (i >= 0)
     {
-        *((short *)vars[i].data) = value;
+        *((short *)var[i].data) = value;
         return 0;
     }
 
@@ -244,7 +240,7 @@ int get__int(char *name, int *value)
     int i = find_variable(name, INT);
     if (i >= 0)
     {
-        *value = *((int *)vars[i].data);
+        *value = *((int *)var[i].data);
         return 0;
     }
 
@@ -267,7 +263,7 @@ int set_int(char *name, int value)
     int i = find_variable(name, INT);
     if (i >= 0)
     {
-        *((int *)vars[i].data) = value;
+        *((int *)var[i].data) = value;
         return 0;
     }
 
@@ -279,7 +275,7 @@ int get__long(char *name, long *value)
     int i = find_variable(name, LONG);
     if (i >= 0)
     {
-        *value = *((long *)vars[i].data);
+        *value = *((long *)var[i].data);
         return 0;
     }
 
@@ -302,7 +298,7 @@ int set_long(char *name, long value)
     int i = find_variable(name, LONG);
     if (i >= 0)
     {
-        *((long *)vars[i].data) = value;
+        *((long *)var[i].data) = value;
         return 0;
     }
 
@@ -314,7 +310,7 @@ int get__float(char *name, float *value)
     int i = find_variable(name, FLOAT);
     if (i >= 0)
     {
-        *value = *((float *)vars[i].data);
+        *value = *((float *)var[i].data);
         return 0;
     }
 
@@ -337,7 +333,7 @@ int set_float(char *name, float value)
     int i = find_variable(name, FLOAT);
     if (i >= 0)
     {
-        *((float *)vars[i].data) = value;
+        *((float *)var[i].data) = value;
         return 0;
     }
 
@@ -349,7 +345,7 @@ int get__double(char *name, double *value)
     int i = find_variable(name, DOUBLE);
     if (i >= 0)
     {
-        *value = *((double *)vars[i].data);
+        *value = *((double *)var[i].data);
         return 0;
     }
 
@@ -372,7 +368,7 @@ int set_double(char *name, double value)
     int i = find_variable(name, DOUBLE);
     if (i >= 0)
     {
-        *((double *)vars[i].data) = value;
+        *((double *)var[i].data) = value;
         return 0;
     }
 
@@ -396,7 +392,7 @@ char * get_string(char *name)
     // Lookup variable
     int i = find_variable(name, STRING);
     if (i >= 0)
-        return (char *)vars[i].data;
+        return (char *)var[i].data;
 
     // Variable not found
     return NULL;
@@ -421,13 +417,13 @@ int set_string(char *name, char *value)
     if (i >= 0)
     {
         // Free previously allocated memory
-        free(vars[i].data);
+        free(var[i].data);
 
         // Reallocate new memory
-        vars[i].data = malloc(strlen(value)+1);
+        var[i].data = malloc(strlen(value)+1);
 
         // Set new string
-        strcpy(vars[i].data, value);
+        strcpy(var[i].data, value);
 
         return 0;
     }
@@ -442,7 +438,7 @@ int run(char *command_name, int *return_value)
     int i = find_command(command_name);
     if (i >= 0)
     {
-        function = commands[i].function;
+        function = command[i].function;
         *return_value = (*function)();
         return 0;
     }
@@ -472,12 +468,12 @@ char * describe(char *name)
     // Lookup variable
     i = find_variable(name, -1);
     if (i >= 0)
-        return (char *)vars[i].description;
+        return (char *)var[i].description;
 
     // Lookup command
     i = find_command(name);
     if (i >= 0)
-        return (char *)commands[i].description;
+        return (char *)command[i].description;
 
     // Variable or command not found
     return NULL;

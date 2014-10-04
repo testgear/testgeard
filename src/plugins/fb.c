@@ -250,9 +250,14 @@ static void put_pattern(struct fb *fb, int pattern)
 
 static int fb_load(void)
 {
-    // Action on load
+    // Set defaults
+    set_string("device", "/dev/fb0");
+    set_int("depth", 32);
     set_int("xres", 640);
     set_int("yres", 480);
+    set_int("xoffset", 0);
+    set_int("yoffset", 0);
+    set_int("pattern", 1);
     set_string("filename", "/tmp/test-pattern.png");
 
     return 0;
@@ -478,45 +483,34 @@ static struct plugin_var_table fb_vars[] =
 {
     {   .name = "device",
         .type = STRING,
-        .value = "/dev/fb0",
         .description = "Name of device" },
 
     {   .name = "xres",
         .type = INT,
-        .value = "1920",
         .description = "Horizontal resolution [pixels]" },
 
     {   .name = "yres",
         .type = INT,
-        .value = "1080",
-        .value_min = "0",
-        .value_max = "1080",
         .description = "Vertical resolution [pixels]" },
 
     {   .name = "depth",
         .type = INT,
-        .value = "32",
-//        .set = fb_depth_set,
         .description = "Color depth" },
 
     {   .name = "xoffset",
         .type = INT,
-        .value = "0",
         .description = "Horizontal offset [pixels]" },
 
     {   .name = "yoffset",
         .type = INT,
-        .value = "0",
         .description = "Vertical offset [pixels]" },
 
     {   .name = "pattern",
         .type = INT,
-        .value = "0",
         .description = "Drawing pattern" },
 
     {   .name = "filename",
         .type = STRING,
-        .value = "/images/test.png",
         .description = "Image filename" },
 
     { }

@@ -36,6 +36,20 @@
 #include <errno.h>
 #include "testgear/plugin.h"
 
+static int dummy_load(void)
+{
+    // Set defaults
+    set_char("char0", 1);
+    set_short("short0", 2);
+    set_int("int0", 3);
+    set_long("long0", 4);
+    set_float("float0", 5);
+    set_double("double0", 6);
+    set_string("string0", "Hi world!");
+
+    return 0;
+}
+
 static int dummy_command0(void)
 {
     printf("Running command!\n");
@@ -57,37 +71,30 @@ static struct plugin_var_table dummy_vars[] =
 {
     {   .name = "char0",
         .type = CHAR,
-        .value = "",
         .description = "Test char 0" },
 
     {   .name = "short0",
         .type = SHORT,
-        .value = "",
         .description = "Test short 0" },
 
     {   .name = "int0",
         .type = INT,
-        .value = "",
         .description = "Test int 0" },
 
     {   .name = "long0",
         .type = LONG,
-        .value = "",
         .description = "Test long 0" },
 
     {   .name = "float0",
         .type = FLOAT,
-        .value = "",
         .description = "Test float 0" },
 
     {   .name = "double0",
         .type = DOUBLE,
-        .value = "",
         .description = "Test double 0" },
 
     {   .name = "string0",
         .type = STRING,
-        .value = "",
         .description = "Test string 0" },
 
     { }
@@ -102,6 +109,7 @@ struct plugin dummy = {
     .license = "BSD-3",
     .commands = dummy_commands,
     .vars = dummy_vars,
+    .load = dummy_load,
 };
 
 plugin_register(dummy);

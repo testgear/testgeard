@@ -36,7 +36,6 @@
 #include <errno.h>
 #include "testgear/plugin.h"
 
-
 static int shell_command(void)
 {
     char *command;
@@ -67,7 +66,6 @@ static struct plugin_var_table shell_vars[] =
 {
     {   .name = "command",
         .type = STRING,
-        .value = "",
         .description = "Command string" },
 
     { }

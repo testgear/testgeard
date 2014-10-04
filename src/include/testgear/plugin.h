@@ -63,9 +63,6 @@ struct plugin_var_table
 {
    const char *name;
    const enum var_type type;
-   char *value;
-   char *value_min;
-   char *value_max;
    const char *description;
    void *data;
 };

@@ -44,6 +44,20 @@
 #include <audiofile.h>
 #include <linux/soundcard.h>
 
+static int audio_load(void)
+{
+    // Set defaults
+    set_string("device", "default");
+    set_int("rate", 44100);
+    set_string("mode", "stereo");
+    set_string("tone-type", "sine");
+    set_int("tone-frequency", 1000);
+    set_int("tone-time", 2000);
+    set_string("wav-file", "test.wav");
+
+    return 0;
+}
+
 static int audio_play_wav(void)
 {
     int error;
@@ -292,37 +306,30 @@ static struct plugin_var_table audio_vars[] =
 {
     {   .name = "device",
         .type = STRING,
-        .value = "default",
         .description = "Alsa audio device" },
 
     {   .name = "rate",
         .type = INT,
-        .value = "44100",
         .description = "Audio device sampling rate [Hz]" },
 
     {   .name = "mode",
         .type = STRING,
-        .value = "stereo",
         .description = "Audio mode (stereo, mono)" },
 
     {   .name = "tone-type",
         .type = STRING,
-        .value = "sine",
         .description = "Tone type (sine, square, triangle, pulse, sawtooth, noise)" },
 
     {   .name = "tone-frequency",
         .type = INT,
-        .value = "1000",
         .description = "Tone frequency [Hz]" },
 
     {   .name = "tone-time",
         .type = INT,
-        .value = "2000",
         .description = "Tone duration [s]" },
 
     {   .name = "wav-file",
         .type = STRING,
-        .value = "test.wav",
         .description = "WAV file for playback" },
 
     { }
@@ -339,6 +346,7 @@ struct plugin audio =
     .license = "BSD-3",
     .commands = audio_commands,
     .vars = audio_vars,
+    .load = audio_load,
 };
 
 
