@@ -37,12 +37,11 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
+#include <linux/soundcard.h>
 #include <alsa/asoundlib.h>
 #include <alsa/pcm.h>
 #include <audiofile.h>
 #include "testgear/plugin.h"
-#include <audiofile.h>
-#include <linux/soundcard.h>
 
 static int audio_load(void)
 {

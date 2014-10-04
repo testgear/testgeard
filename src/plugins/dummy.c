@@ -52,7 +52,16 @@ static int dummy_load(void)
 
 static int dummy_command0(void)
 {
-    printf("Running command!\n");
+    printf("Running command0!\n");
+
+    printf("char0 = %d\n", get_char("char0"));
+    printf("short0 = %d\n", get_short("short0"));
+    printf("int0 = %d\n", get_int("int0"));
+    printf("long0 = %ld\n", get_long("long0"));
+    printf("float0 = %f\n", get_float("float0"));
+    printf("double0 = %f\n", get_double("double0"));
+    printf("string0 = %s\n", get_string("string0"));
+
     return 0;
 }
 
