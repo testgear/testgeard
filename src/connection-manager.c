@@ -55,7 +55,7 @@ void connection_manager_start(void)
             io.read = &tcp_read;
             io.close = &tcp_close;
             message_register_io(&io);
-            tcp_server_start(option.port);
+            tcp_server_start(option.tcp_port);
             break;
         case USB:
         case SERIAL:

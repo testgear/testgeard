@@ -41,9 +41,12 @@
 
 struct option_t option =
 {
-    false,
-    TCP,
-    8000
+    false,  // Daemonize true/false
+    TCP,    // Connection type
+    8000,   // TCP server listen port
+    "",     // Serial device
+    0,      // USB vendor id
+    0       // USB product id
 };
 
 void print_options_help(char *argv[])
@@ -51,12 +54,13 @@ void print_options_help(char *argv[])
     printf("Usage: %s [options]\n", argv[0]);
     printf("\n");
     printf("Options:\n");
-    printf("  --connection <connection>  Connection type ('tcp' or 'serial')\n");
-    printf("  --device <device>          Serial device (eg. '/dev/ttyUSB1')\n");
-    printf("  --port <port>              TCP listen port (default is %d)\n", option.port);
-    printf("  --daemon                   Daemonize\n");
-    printf("  --version                  Display version\n");
-    printf("  --help                     Display help\n");
+    printf("  -c, --connection tcp|usb|serial  Connection type (default: tcp)\n");
+    printf("  -p, --tcp-port <port>            TCP listen port (default: %d)\n", option.tcp_port);
+    printf("  -d, --serial-device <device>     Serial device\n");
+    printf("  -i, --usb-id <vendor>:<product>  USB vendor and product id\n");
+    printf("  -D, --daemon                     Daemonize\n");
+    printf("  -v, --version                    Display version\n");
+    printf("  -h, --help                       Display help\n");
     printf("\n");
 }
 
@@ -68,17 +72,21 @@ void parse_options(int argc, char *argv[])
     {
         static struct option long_options[] =
         {
-            {"daemon",	no_argument, 0, 'z'},
-            {"version",	no_argument, 0, 'v'},
-            {"help",	   no_argument, 0, 'h'},
-            {0,         0,           0,  0 }
+            {"connection",    required_argument, 0, 'c'},
+            {"tcp-port",      required_argument, 0, 'p'},
+            {"serial-device", required_argument, 0, 'd'},
+            {"usb-id",        required_argument, 0, 'i'},
+            {"daemon",        no_argument,       0, 'D'},
+            {"version",       no_argument,       0, 'v'},
+            {"help",          no_argument,       0, 'h'},
+            {0,               0,                 0,  0 }
         };
 
         // getopt_long stores the option index here
         int option_index = 0;
 
         // Parse argument using getopt_long
-        c = getopt_long (argc, argv, "", long_options, &option_index);
+        c = getopt_long (argc, argv, "c:p:d:i:Dvh", long_options, &option_index);
 
         // Detect the end of the options
         if (c == -1)
@@ -96,7 +104,39 @@ void parse_options(int argc, char *argv[])
                 printf("\n");
                 break;
 
-            case 'z':
+            case 'c':
+                if (strcmp("tcp", optarg) == 0)
+                    option.connection = TCP;
+                else if (strcmp("usb", optarg) == 0)
+                {
+                    option.connection = USB;
+                    printf("Sorry, usb is not supported yet.\n");
+                    exit(EXIT_FAILURE);
+                }
+                else if (strcmp("serial", optarg) == 0)
+                {
+                    option.connection = SERIAL;
+                    printf("Sorry, serial is not supported yet.\n");
+                    exit(EXIT_FAILURE);
+                }
+                else
+                {
+                    printf("Error: Invalid connection type.\n");
+                    exit(EXIT_FAILURE);
+                }
+                break;
+
+            case 'p':
+                option.tcp_port = atoi(optarg);
+                break;
+
+            case 'd':
+                break;
+
+            case 'i':
+                break;
+
+            case 'D':
                 option.daemon = true;
                 break;
 

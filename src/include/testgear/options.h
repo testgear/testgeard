@@ -46,9 +46,12 @@ enum connection_t
 /* Options */
 struct option_t
 {
-    int               daemon; // Daemonize yes/no
+    bool              daemon;
     enum connection_t connection;
-    int               port;   // TCP server listen port
+    int               tcp_port;
+    char              serial_device[512];
+    int               usb_vendor_id;
+    int               usb_product_id;
 };
 
 extern struct option_t option;
