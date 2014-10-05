@@ -93,6 +93,12 @@ int tcp_read(void *buffer, int length)
     return size;
 }
 
+int tcp_close(void)
+{
+    close(client_socket);
+    return 0;
+}
+
 /*
  * start_tcp_server() - Starts TCP server
  *
@@ -151,5 +157,5 @@ void tcp_server_start(int port)
 
     // Process incoming messages
     while (1)
-        handle_incoming_message(server_socket);
+        handle_incoming_message();
 }

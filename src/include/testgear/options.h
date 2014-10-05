@@ -36,12 +36,19 @@
 #define STOPPED 0
 #define RUNNING 1
 
+enum connection_t
+{
+    TCP,
+    USB,
+    SERIAL
+};
+
 /* Options */
 struct option_t
 {
-    int    daemon; // Daemonize yes/no
-    int    state;
-    int    port;   // TCP server listen port
+    int               daemon; // Daemonize yes/no
+    enum connection_t connection;
+    int               port;   // TCP server listen port
 };
 
 extern struct option_t option;

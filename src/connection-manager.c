@@ -28,12 +28,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
 #include "testgear/connection-manager.h"
 #include "testgear/tcp.h"
 #include "testgear/options.h"
+#include "testgear/message.h"
 
 void connection_manager_start(void)
 {
+    struct message_io_t io;
+
     // Start listen on connection types:
     //
     // Network:
@@ -41,5 +48,21 @@ void connection_manager_start(void)
     // Serial device:
     //      /dev/USBtty0
 
-    tcp_server_start(option.port);
+    switch (option.connection)
+    {
+        case TCP:
+            io.write = &tcp_write;
+            io.read = &tcp_read;
+            io.close = &tcp_close;
+            message_register_io(&io);
+            tcp_server_start(option.port);
+            break;
+        case USB:
+        case SERIAL:
+            break;
+        default:
+            printf("Error: Invalid connection type!");
+            exit(EXIT_FAILURE);
+            break;
+    }
 }

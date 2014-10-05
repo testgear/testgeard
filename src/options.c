@@ -42,10 +42,9 @@
 struct option_t option =
 {
     false,
-    RUNNING,
+    TCP,
     8000
 };
-
 
 void print_options_help(char *argv[])
 {

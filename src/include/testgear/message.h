@@ -67,6 +67,15 @@ int submit_message(int handle,
                  int set_value_size,
                  int timeout);
 
-int handle_incoming_message(int server_socket);
+int handle_incoming_message(void);
+
+struct message_io_t
+{
+    int (*write)(void *buffer, int length);
+    int (*read)(void *buffer, int length);
+    int (*close)(void);
+};
+
+int message_register_io(struct message_io_t *io);
 
 #endif

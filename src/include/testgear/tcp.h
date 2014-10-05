@@ -34,7 +34,6 @@
 int tcp_server_start(int port);
 int tcp_write(void *buffer, int length);
 int tcp_read(void *buffer, int length);
-
-extern int client_socket;
+int tcp_close(void);
 
 #endif

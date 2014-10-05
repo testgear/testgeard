@@ -141,6 +141,8 @@
 #define MSG_HEADER_SIZE 10
 #define MSG_NAME_LENGTH_MAX 256
 
+static struct message_io_t *msg_io;
+
 static unsigned int message_counter = 0;
 
 static char error_message[4096] = "";
@@ -153,6 +155,14 @@ struct __attribute__((__packed__)) msg_header_t
    unsigned int payload_length;
    char payload; // Fake payload item (for reference only)
 };
+
+int message_register_io(struct message_io_t *io)
+{
+    msg_io = io;
+
+    // Check for NULL functions here
+    return 0;
+}
 
 static int value_size(int command)
 { 
@@ -484,7 +494,7 @@ int submit_message(int handle,
     debug_printf("Sending %s (%x) message with ID %d\n", message_type(type), type, id);
 
     // Send request message
-    ret = tcp_write(message, length);
+    ret = msg_io->write(message, length);
     if (ret < 0 )
     {
         return -1;
@@ -494,10 +504,10 @@ int submit_message(int handle,
     free(message);
 
     // Receive response message header
-    if (tcp_read(&msg_header, MSG_HEADER_SIZE) == 0)
+    if (msg_io->read(&msg_header, MSG_HEADER_SIZE) == 0)
     {
         printf("Server closed connection1\n");
-        close(server_socket);
+        msg_io->close();
         exit(-1);
     }
 
@@ -515,10 +525,10 @@ int submit_message(int handle,
         }
 
         // Receive payload
-        if (tcp_read(payload, msg_header.payload_length) == 0)
+        if (msg_io->read(payload, msg_header.payload_length) == 0)
         {
             printf("Server closed connection2\n");
-            close(server_socket);
+            msg_io->close();
             free(payload);
             exit(-1);
         }
@@ -576,7 +586,7 @@ int decode_tg_string(char *string, char *plugin, char *variable)
     return 0;
 }
 
-int handle_incoming_message(int server_socket)
+int handle_incoming_message(void)
 {
     struct msg_header_t msg_header;
     unsigned int id;
@@ -601,10 +611,10 @@ int handle_incoming_message(int server_socket)
      */
 
     // Receive message header
-    if (tcp_read(&msg_header, MSG_HEADER_SIZE) == 0)
+    if (msg_io->read(&msg_header, MSG_HEADER_SIZE) == 0)
     {
         printf("Client closed connection\n");
-        close(client_socket);
+        msg_io->close();
         exit(-1);
     }
 
@@ -622,10 +632,10 @@ int handle_incoming_message(int server_socket)
         }
 
         // Receive payload
-        if (tcp_read(payload, msg_header.payload_length) == 0)
+        if (msg_io->read(payload, msg_header.payload_length) == 0)
         {
             printf("Client closed connection\n");
-            close(client_socket);
+            msg_io->close();
             free(payload);
             exit(-1);
         }
@@ -926,7 +936,7 @@ int handle_incoming_message(int server_socket)
     debug_printf("Sending %s (%x) message with ID %d\n", message_type(response_type), response_type, id);
 
     // Send response message
-    ret = tcp_write(response_message, length);
+    ret = msg_io->write(response_message, length);
     if (ret < 0 )
         return -1;
 
