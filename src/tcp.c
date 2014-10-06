@@ -100,11 +100,11 @@ int tcp_close(void)
 }
 
 /*
- * start_tcp_server() - Starts TCP server
+ * tcp_server_start() - Starts TCP server
  *
- * This will listen for any incoming connections on defined port.
- * Received data will be handled and interperted by the test gear message
- * protocol handler.
+ * This will listen for any incoming connections on provided port.
+ * Receiving and sending of data will be performed by the test gear message
+ * protocol handler ( handle_incoming_message() )
  */
 
 void tcp_server_start(int port)
