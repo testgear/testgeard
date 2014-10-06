@@ -193,7 +193,7 @@ static int create_message(void **msg_buffer,
                    const char *name,
                    void *value,
                    int value_length,
-                   unsigned int *id)
+                   unsigned int id)
 {
     struct msg_header_t *message;
     unsigned char name_length = 0;
@@ -226,7 +226,7 @@ static int create_message(void **msg_buffer,
     // Create message header
     message         = *msg_buffer;
     message->prefix = MSG_PREFIX;
-    message->id     = message_counter;
+    message->id     = id;
     message->type   = type;
     
     payload = &message->payload;
@@ -284,12 +284,6 @@ static int create_message(void **msg_buffer,
     }
  
     msg_length = MSG_HEADER_SIZE + message->payload_length;
-
-    // Return message ID
-    *id = message_counter;
-
-    // Increase message counter
-    message_counter++;
 
     // Return length of contructed message
     return msg_length;
@@ -483,11 +477,11 @@ int submit_message(int handle,
     char *message;
     char *payload;
     int length;
-    unsigned int id;
+    static unsigned int id = 0;
     int ret;
 
     // Create request message
-    length = create_message( (void *) &message, type, name, set_value, set_value_size, &id);
+    length = create_message( (void *) &message, type, name, set_value, set_value_size, id);
     if (length < 0)
         return -1;
 
@@ -549,6 +543,8 @@ int submit_message(int handle,
 
         free(payload);
     }
+
+    id++;
 
     return 0;
 }
@@ -615,11 +611,13 @@ int handle_incoming_message(void)
     {
         printf("Client closed connection\n");
         msg_io->close();
-        exit(-1);
+        return 0;
     }
 
     // Verify message header
     verify_request(&msg_header);
+
+    id = msg_header.id;
 
     if (msg_header.type != LIST_PLUGINS)
     {
@@ -637,7 +635,7 @@ int handle_incoming_message(void)
             printf("Client closed connection\n");
             msg_io->close();
             free(payload);
-            exit(-1);
+            return 0;
         }
     }
 
@@ -929,7 +927,7 @@ int handle_incoming_message(void)
         free(payload);
 
     // Create response message
-    length = create_message( (void *) &response_message, response_type, NULL, response_value, response_size, &id);
+    length = create_message( (void *) &response_message, response_type, NULL, response_value, response_size, id);
     if (length < 0)
         return -1;
 

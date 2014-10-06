@@ -42,6 +42,7 @@
 #include "testgear/message.h"
 
 int server_socket, client_socket;
+static bool connected = false;
 
 void tcp_dump_data(void *data, int length)
 {
@@ -96,6 +97,7 @@ int tcp_read(void *buffer, int length)
 int tcp_close(void)
 {
     close(client_socket);
+    connected = false;
     return 0;
 }
 
@@ -144,18 +146,23 @@ void tcp_server_start(int port)
 
     debug_printf("Listening for incoming client connection on port %d...\n", port);
 
-    // Wait and accept any incoming connection
-    socklen_t sin_size = sizeof(struct sockaddr_in);
-    if ((client_socket = accept(server_socket, (struct sockaddr *) &client_address, (socklen_t *) &sin_size)) < 0)
-    {
-        perror("Error: accept() call failed");
-        close(server_socket);
-        exit (-1);
-    }
-
-    debug_printf("Incoming connection from client (%s)\n", inet_ntoa(client_address.sin_addr));
-
-    // Process incoming messages
     while (1)
-        handle_incoming_message();
+    {
+        // Wait and accept any incoming connection
+        socklen_t sin_size = sizeof(struct sockaddr_in);
+        if ((client_socket = accept(server_socket, (struct sockaddr *) &client_address, (socklen_t *) &sin_size)) < 0)
+        {
+            perror("Error: accept() call failed");
+            close(server_socket);
+            exit (-1);
+        }
+
+        connected = true;
+
+        debug_printf("Incoming connection from client (%s)\n", inet_ntoa(client_address.sin_addr));
+
+        // Process incoming messages
+        while (connected)
+            handle_incoming_message();
+    }
 }
