@@ -39,6 +39,7 @@
 #include "testgear/plugin-manager.h"
 #else
 #include "testgear/testgear.h"
+#include "testgear/session.h"
 #endif
 
 /*
@@ -156,6 +157,7 @@ struct __attribute__((__packed__)) msg_header_t
    char payload; // Fake payload item (for reference only)
 };
 
+#ifdef SERVER
 int message_register_io(struct message_io_t *io)
 {
     msg_io = io;
@@ -163,6 +165,7 @@ int message_register_io(struct message_io_t *io)
     // Check for NULL functions here
     return 0;
 }
+#endif
 
 static int value_size(int command)
 { 
@@ -488,7 +491,7 @@ int submit_message(int handle,
     debug_printf("Sending %s (%x) message with ID %d\n", message_type(type), type, id);
 
     // Send request message
-    ret = msg_io->write(message, length);
+    ret = session[handle].write(handle, message, length);
     if (ret < 0 )
     {
         return -1;
@@ -498,10 +501,10 @@ int submit_message(int handle,
     free(message);
 
     // Receive response message header
-    if (msg_io->read(&msg_header, MSG_HEADER_SIZE) == 0)
+    if (session[handle].read(handle, &msg_header, MSG_HEADER_SIZE) == 0)
     {
         printf("Server closed connection1\n");
-        msg_io->close();
+        session[handle].close(handle);
         exit(-1);
     }
 
@@ -519,10 +522,10 @@ int submit_message(int handle,
         }
 
         // Receive payload
-        if (msg_io->read(payload, msg_header.payload_length) == 0)
+        if (session[handle].read(handle, payload, msg_header.payload_length) == 0)
         {
             printf("Server closed connection2\n");
-            msg_io->close();
+            session[handle].close(handle);
             free(payload);
             exit(-1);
         }
