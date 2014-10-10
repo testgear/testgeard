@@ -222,7 +222,7 @@ static int create_message(void **msg_buffer,
     *msg_buffer = malloc(MSG_HEADER_SIZE + 1 + name_length + 4 + value_length);
     if (msg_buffer == NULL)
     {
-        perror("Error: malloc() failed");
+        printf("Error: malloc() failed");
         return -1;
     }
 
@@ -282,7 +282,7 @@ static int create_message(void **msg_buffer,
         case SET_DATA:
         default:
             printf("Error: Unknown message type\n");
-            exit(-1);
+            return -1;
             break;
     }
  
@@ -503,9 +503,9 @@ int submit_message(int handle,
     // Receive response message header
     if (session[handle].read(handle, &msg_header, MSG_HEADER_SIZE) == 0)
     {
-        printf("Server closed connection1\n");
+        tg_error = "Server closed connection";
         session[handle].close(handle);
-        exit(-1);
+        return -1;
     }
 
     // Verify response message
@@ -517,17 +517,17 @@ int submit_message(int handle,
         payload = malloc(msg_header.payload_length + 1);
         if (payload == NULL)
         {
-            perror("Error: malloc() failed");
+            printf("Error: malloc() failed");
             return -1;
         }
 
         // Receive payload
         if (session[handle].read(handle, payload, msg_header.payload_length) == 0)
         {
-            printf("Server closed connection2\n");
+            tg_error = "Server closed connection";
             session[handle].close(handle);
             free(payload);
-            exit(-1);
+            return -1;
         }
 
         if (msg_header.type == RSP_OK)
@@ -628,7 +628,7 @@ int handle_incoming_message(void)
         payload = malloc(msg_header.payload_length);
         if (payload == NULL)
         {
-            perror("Error: malloc() failed");
+            printf("Error: malloc() failed");
             return -1;
         }
 
