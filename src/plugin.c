@@ -34,48 +34,67 @@
 #include "testgear/plugin.h"
 
 static struct plugin *plugin;
-static struct plugin_var_table *var;
-static struct plugin_command_table *command;
+static struct plugin_properties *property;
 
-static void initialize_vars(struct plugin_var_table *var)
+static void verify_properties(struct plugin_properties *property)
+{
+    int i,j;
+
+    // Check for duplicate property names
+    for (i=0; property[i].name; i++)
+    {
+        for (j=0; property[j].name; j++)
+        {
+            // Do not compare itself
+            if (i != j)
+            {
+                if (strcmp(property[i].name, property[j].name) == 0)
+                    printf("Warning: Duplicate property name found! (%s)\n", property[i].name);
+            }
+        }
+    }
+}
+
+static void initialize_properties(struct plugin_properties *property)
 {
     int i;
 
-    for (i=0; var[i].name; i++)
+    for (i=0; property[i].name; i++)
     {
-        switch (var[i].type)
+        switch (property[i].type)
         {
             case CHAR:
-                var[i].data = malloc(sizeof(char));
-                *((char *)var[i].data) = 0;
+                property[i].data = malloc(sizeof(char));
+                *((char *)property[i].data) = 0;
                 break;
             case SHORT:
-                var[i].data = malloc(sizeof(short));
-                *((short *)var[i].data) = 0;
+                property[i].data = malloc(sizeof(short));
+                *((short *)property[i].data) = 0;
                 break;
             case INT:
-                var[i].data = malloc(sizeof(int));
-                *((int *)var[i].data) = 0;
+                property[i].data = malloc(sizeof(int));
+                *((int *)property[i].data) = 0;
                 break;
             case LONG:
-                var[i].data = malloc(sizeof(long));
-                *((long *)var[i].data) = 0;
+                property[i].data = malloc(sizeof(long));
+                *((long *)property[i].data) = 0;
                 break;
             case FLOAT:
-                var[i].data = malloc(sizeof(float));
-                *((float *)var[i].data) = 0;
+                property[i].data = malloc(sizeof(float));
+                *((float *)property[i].data) = 0;
                 break;
             case DOUBLE:
-                var[i].data = malloc(sizeof(double));
-                *((double *)var[i].data) = 0;
+                property[i].data = malloc(sizeof(double));
+                *((double *)property[i].data) = 0;
                 break;
             case STRING:
-                var[i].data = malloc(4);
-                strcpy(var[i].data, "");
+                property[i].data = malloc(4);
+                strcpy(property[i].data, "");
                 break;
             case DATA:
-                var[i].data = NULL;
+                property[i].data = NULL;
                 break;
+            case COMMAND:
             default:
                 break;
         }
@@ -84,61 +103,62 @@ static void initialize_vars(struct plugin_var_table *var)
 
 int init(void)
 {
-    initialize_vars(plugin->vars);
+    verify_properties(plugin->properties);
+    initialize_properties(plugin->properties);
     return 0;
 }
 
 void register_plugin(struct plugin *plug)
 {
     plugin = plug;
-    var = plug->vars;
-    command = plug->commands;
+    property = plug->properties;
     plug->init = &init;
 }
 
 int list_properties(char *properties)
 {
     int i;
-    char buffer[256] = "";
+    char buffer[4096] = "";
 
-    // Traverse all variables
-    for (i=0; var[i].name; i++)
+    // Traverse all variables and commands
+    for (i=0; property[i].name; i++)
     {
-        sprintf(buffer, "%s:", var[i].name);
-        strcat(properties, buffer);
-        sprintf(buffer, "%d,", var[i].type);
-        strcat(properties, buffer);
+        if (property[i].type != COMMAND)
+        {
+            // Variable found
+            sprintf(buffer, "%s:", property[i].name);
+            strcat(properties, buffer);
+            sprintf(buffer, "%d,", property[i].type);
+            strcat(properties, buffer);
+        } else
+        {
+            // Command found
+            sprintf(buffer, "%s:%d,", property[i].name, COMMAND);
+            strcat(properties, buffer);
+        }
     }
 
-    buffer[0] = 0;
-
-    // Traverse all commands
-    for (i=0; command[i].name; i++)
-    {
-        sprintf(buffer, "%s:%d,", command[i].name, COMMAND);
-        strcat(properties, buffer);
-    }
-
+    // Remove trailing ','
     properties[strlen(properties)-1] = 0;
 
     return 0;
 }
 
-static int find_variable(char *name, int type)
+static int find_property(char *name, int type)
 {
     int i;
 
-    // Find variable matching name
-    for (i=0; var[i].name; i++)
+    // Find property matching name
+    for (i=0; property[i].name; i++)
     {
-        if (strcmp(name, var[i].name) == 0)
+        if (strcmp(name, property[i].name) == 0)
         {
             if (type != -1)
             {
                 // Check matching type
-                if (var[i].type != type)
+                if (property[i].type != type)
                 {
-                    printf("Warning: Variable %s has different type\n", var[i].name);
+                    printf("Warning: Property %s has different type\n", property[i].name);
                     return -1;
                 }
             }
@@ -146,31 +166,16 @@ static int find_variable(char *name, int type)
         }
     }
 
-    printf("Warning: Variable %s not found\n", name);
-    return -1;
-}
-
-static int find_command(char *name)
-{
-    int i;
-
-    // Find command matching name
-    for (i=0; command[i].name; i++)
-    {
-        if (strcmp(name, command[i].name) == 0)
-            return i;
-    }
-
-    printf("Warning: Command %s not found\n", name);
+    printf("Warning: Property %s not found\n", name);
     return -1;
 }
 
 int get__char(char *name, char *value)
 {
-    int i = find_variable(name, CHAR);
+    int i = find_property(name, CHAR);
     if (i >= 0)
     {
-        *value = *((char *)var[i].data);
+        *value = *((char *)property[i].data);
         return 0;
     }
 
@@ -190,10 +195,10 @@ char get_char(char *name)
 
 int set_char(char *name, char value)
 {
-    int i = find_variable(name, CHAR);
+    int i = find_property(name, CHAR);
     if (i >= 0)
     {
-        *((char *)var[i].data) = value;
+        *((char *)property[i].data) = value;
         return 0;
     }
 
@@ -202,10 +207,10 @@ int set_char(char *name, char value)
 
 int get__short(char *name, short *value)
 {
-    int i = find_variable(name, SHORT);
+    int i = find_property(name, SHORT);
     if (i >= 0)
     {
-        *value = *((short *)var[i].data);
+        *value = *((short *)property[i].data);
         return 0;
     }
 
@@ -225,10 +230,10 @@ short get_short(char *name)
 
 int set_short(char *name, short value)
 {
-    int i = find_variable(name, SHORT);
+    int i = find_property(name, SHORT);
     if (i >= 0)
     {
-        *((short *)var[i].data) = value;
+        *((short *)property[i].data) = value;
         return 0;
     }
 
@@ -237,10 +242,10 @@ int set_short(char *name, short value)
 
 int get__int(char *name, int *value)
 {
-    int i = find_variable(name, INT);
+    int i = find_property(name, INT);
     if (i >= 0)
     {
-        *value = *((int *)var[i].data);
+        *value = *((int *)property[i].data);
         return 0;
     }
 
@@ -260,10 +265,10 @@ int get_int(char *name)
 
 int set_int(char *name, int value)
 {
-    int i = find_variable(name, INT);
+    int i = find_property(name, INT);
     if (i >= 0)
     {
-        *((int *)var[i].data) = value;
+        *((int *)property[i].data) = value;
         return 0;
     }
 
@@ -272,10 +277,10 @@ int set_int(char *name, int value)
 
 int get__long(char *name, long *value)
 {
-    int i = find_variable(name, LONG);
+    int i = find_property(name, LONG);
     if (i >= 0)
     {
-        *value = *((long *)var[i].data);
+        *value = *((long *)property[i].data);
         return 0;
     }
 
@@ -295,10 +300,10 @@ long get_long(char *name)
 
 int set_long(char *name, long value)
 {
-    int i = find_variable(name, LONG);
+    int i = find_property(name, LONG);
     if (i >= 0)
     {
-        *((long *)var[i].data) = value;
+        *((long *)property[i].data) = value;
         return 0;
     }
 
@@ -307,10 +312,10 @@ int set_long(char *name, long value)
 
 int get__float(char *name, float *value)
 {
-    int i = find_variable(name, FLOAT);
+    int i = find_property(name, FLOAT);
     if (i >= 0)
     {
-        *value = *((float *)var[i].data);
+        *value = *((float *)property[i].data);
         return 0;
     }
 
@@ -330,10 +335,10 @@ float get_float(char *name)
 
 int set_float(char *name, float value)
 {
-    int i = find_variable(name, FLOAT);
+    int i = find_property(name, FLOAT);
     if (i >= 0)
     {
-        *((float *)var[i].data) = value;
+        *((float *)property[i].data) = value;
         return 0;
     }
 
@@ -342,10 +347,10 @@ int set_float(char *name, float value)
 
 int get__double(char *name, double *value)
 {
-    int i = find_variable(name, DOUBLE);
+    int i = find_property(name, DOUBLE);
     if (i >= 0)
     {
-        *value = *((double *)var[i].data);
+        *value = *((double *)property[i].data);
         return 0;
     }
 
@@ -365,10 +370,10 @@ double get_double(char *name)
 
 int set_double(char *name, double value)
 {
-    int i = find_variable(name, DOUBLE);
+    int i = find_property(name, DOUBLE);
     if (i >= 0)
     {
-        *((double *)var[i].data) = value;
+        *((double *)property[i].data) = value;
         return 0;
     }
 
@@ -389,12 +394,12 @@ char * get_string(char *name)
     if (strcmp(name, "license") == 0)
         return (char *) plugin->license;
 
-    // Lookup variable
-    int i = find_variable(name, STRING);
+    // Lookup property
+    int i = find_property(name, STRING);
     if (i >= 0)
-        return (char *)var[i].data;
+        return (char *)property[i].data;
 
-    // Variable not found
+    // Property not found
     return NULL;
 }
 
@@ -413,17 +418,17 @@ int set_string(char *name, char *value)
         return -1;
 
     // Lookup variable
-    int i = find_variable(name, STRING);
+    int i = find_property(name, STRING);
     if (i >= 0)
     {
         // Free previously allocated memory
-        free(var[i].data);
+        free(property[i].data);
 
         // Reallocate new memory
-        var[i].data = malloc(strlen(value)+1);
+        property[i].data = malloc(strlen(value)+1);
 
         // Set new string
-        strcpy(var[i].data, value);
+        strcpy(property[i].data, value);
 
         return 0;
     }
@@ -435,10 +440,10 @@ int run(char *command_name, int *return_value)
 {
     int (*function)(void);
 
-    int i = find_command(command_name);
+    int i = find_property(command_name, COMMAND);
     if (i >= 0)
     {
-        function = command[i].function;
+        function = property[i].function;
         *return_value = (*function)();
         return 0;
     }
@@ -465,15 +470,10 @@ char * describe(char *name)
     if (strcmp(name, "license") == 0)
         return "Plugin license";
 
-    // Lookup variable
-    i = find_variable(name, -1);
+    // Lookup property
+    i = find_property(name, -1);
     if (i >= 0)
-        return (char *)var[i].description;
-
-    // Lookup command
-    i = find_command(name);
-    if (i >= 0)
-        return (char *)command[i].description;
+        return (char *)property[i].description;
 
     // Variable or command not found
     return NULL;

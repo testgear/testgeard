@@ -3,7 +3,7 @@ CFLAGS=-Wall -Wno-unused-variable -Wno-unused-but-set-variable
 LDFLAGS=-lc -ldl
 INCLUDE=-I../include
 
-all: dummy.so fb.so shell.so audio.so
+all: dummy.so shell.so fb.so audio.so
 
 plugin.o: ../plugin.c
 	$(CC) $(CFLAGS) $(INCLUDE) -fPIC -c ../plugin.c

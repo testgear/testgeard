@@ -1,7 +1,7 @@
 /*
  * Shell command plugin for Test Gear
  *
- * Copyright (c) 2012-2013, Martin Lund
+ * Copyright (c) 2012-2014, Martin Lund
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,39 +49,29 @@ static int shell_command(void)
     return WEXITSTATUS(status);
 }
 
-
-// Plugin commands
-static struct plugin_command_table shell_commands[] =
+// Plugin properties
+static struct plugin_properties shell_properties[] =
 {
+    {   .name = "command",
+        .type = STRING,
+        .description = "Command string" },
+
     {   .name = "run",
+        .type = COMMAND,
         .function = shell_command,
         .description = "Run command" },
 
     { }
 };
 
-
-// Plugin variables
-static struct plugin_var_table shell_vars[] =
-{
-    {   .name = "command",
-        .type = STRING,
-        .description = "Command string" },
-
-    { }
-};
-
-
 // Plugin configuration
 struct plugin shell = {
     .name = "shell",
-    .version = "0.1",
+    .version = "0.2",
     .description = "Shell plugin",
     .author = "Martin Lund",
     .license = "BSD-3",
-    .commands = shell_commands,
-    .vars = shell_vars,
+    .properties = shell_properties,
 };
-
 
 plugin_register(shell);

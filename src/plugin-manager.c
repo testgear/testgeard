@@ -63,12 +63,18 @@ static void plugin_print_info(struct plugin *plugin)
     debug_printf(" Author: %s\n", plugin->author);
     debug_printf(" License: %s\n", plugin->license);
     debug_printf(" Commands: ");
-    for (i=0; plugin->commands[i].name; i++)
-        debug_printf_raw("%s ", plugin->commands[i].name);
+    for (i=0; plugin->properties[i].name; i++)
+    {
+        if (plugin->properties[i].type == COMMAND)
+            debug_printf_raw("%s ", plugin->properties[i].name);
+    }
     debug_printf_raw("\n");
     debug_printf(" Variables: ");
-    for (i=0; plugin->vars[i].name; i++)
-        debug_printf_raw("%s ", plugin->vars[i].name);
+    for (i=0; plugin->properties[i].name; i++)
+    {
+        if (plugin->properties[i].type != COMMAND)
+            debug_printf_raw("%s ", plugin->properties[i].name);
+    }
     debug_printf_raw("\n");
     debug_printf("\n");
 }

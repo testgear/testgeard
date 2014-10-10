@@ -1,7 +1,7 @@
 /*
  * Framebuffer test plugin for Test Gear
  *
- * Copyright (c) 2012-2013, Martin Lund
+ * Copyright (c) 2012-2014, Martin Lund
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -247,7 +247,6 @@ static void put_pattern(struct fb *fb, int pattern)
  *
  */
 
-
 static int fb_load(void)
 {
     // Set defaults
@@ -263,7 +262,6 @@ static int fb_load(void)
     return 0;
 }
 
-
 static int fb_unload(void)
 {
     // Action on unload
@@ -278,7 +276,6 @@ static int fb_unload(void)
 
     return 0;
 }
-
 
 static int fb_set_resolution(void)
 {
@@ -320,7 +317,6 @@ static int fb_set_resolution(void)
 
     return 0;
 }
-
 
 static int fb_set_depth(void)
 {
@@ -409,7 +405,6 @@ static int fb_set_depth(void)
     return 0;
 }
 
-
 static int fb_draw_pattern(void)
 {
     int status;
@@ -432,7 +427,6 @@ static int fb_draw_pattern(void)
     return 0;
 }
 
-
 static int fb_show_image(void)
 {
     int status;
@@ -454,32 +448,8 @@ static int fb_show_image(void)
     return 0;
 }
 
-
-// Plugin commands
-static struct plugin_command_table fb_commands[] =
-{
-    {   .name = "set_resolution",
-        .function = fb_set_resolution,
-        .description = "Set resolution command" },
-
-    {   .name = "set_depth",
-        .function = fb_set_depth,
-        .description = "Set depth command" },
-
-    {   .name = "draw_pattern",
-        .function = fb_draw_pattern,
-        .description = "Fill screen with pattern" },
-
-    {   .name = "show_image",
-        .function = fb_show_image,
-        .description = "Show image on screen" },
-
-    { }
-};
-
-
-// Plugin variables
-static struct plugin_var_table fb_vars[] =
+// Plugin properties
+static struct plugin_properties fb_properties[] =
 {
     {   .name = "device",
         .type = STRING,
@@ -513,22 +483,39 @@ static struct plugin_var_table fb_vars[] =
         .type = STRING,
         .description = "Image filename" },
 
+    {   .name = "set_resolution",
+        .type = COMMAND,
+        .function = fb_set_resolution,
+        .description = "Set resolution command" },
+
+    {   .name = "set_depth",
+        .type = COMMAND,
+        .function = fb_set_depth,
+        .description = "Set depth command" },
+
+    {   .name = "draw_pattern",
+        .type = COMMAND,
+        .function = fb_draw_pattern,
+        .description = "Fill screen with pattern" },
+
+    {   .name = "show_image",
+        .type = COMMAND,
+        .function = fb_show_image,
+        .description = "Show image on screen" },
+
     { }
 };
-
 
 // Plugin configuration
 struct plugin fb_plugin = {
     .name = "fb",
-    .version = "0.1",
+    .version = "0.2",
     .description = "Framebuffer test plugin",
     .author = "Martin Lund",
     .license = "BSD-3",
     .load = fb_load,
     .unload = fb_unload,
-    .commands = fb_commands,
-    .vars = fb_vars,
+    .properties = fb_properties,
 };
-
 
 plugin_register(fb_plugin);

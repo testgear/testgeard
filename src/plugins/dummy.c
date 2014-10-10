@@ -65,18 +65,8 @@ static int dummy_command0(void)
     return 0;
 }
 
-// Plugin commands
-static struct plugin_command_table dummy_commands[] =
-{
-    {   .name = "command0",
-        .function = dummy_command0,
-        .description = "Run command" },
-
-    { }
-};
-
-// Plugin variables
-static struct plugin_var_table dummy_vars[] =
+// Plugin properties
+static struct plugin_properties dummy_properties[] =
 {
     {   .name = "char0",
         .type = CHAR,
@@ -106,18 +96,23 @@ static struct plugin_var_table dummy_vars[] =
         .type = STRING,
         .description = "Test string 0" },
 
+    {   .name = "command0",
+        .type = COMMAND,
+        .function = dummy_command0,
+        .description = "Run command" },
+
     { }
 };
 
 // Plugin configuration
-struct plugin dummy = {
+struct plugin dummy =
+{
     .name = "dummy",
-    .version = "0.1",
+    .version = "0.2",
     .description = "Dummy plugin (for testing only)",
     .author = "Martin Lund",
     .license = "BSD-3",
-    .commands = dummy_commands,
-    .vars = dummy_vars,
+    .properties = dummy_properties,
     .load = dummy_load,
 };
 

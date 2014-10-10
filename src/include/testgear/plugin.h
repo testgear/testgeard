@@ -33,14 +33,7 @@
 
 #include <stdbool.h>
 
-struct plugin_command_table
-{
-   const char *name;
-   int (*function)(void);
-   const char *description;
-};
-
-enum var_type
+enum property_type
 {
    CHAR,
    SHORT,
@@ -50,20 +43,15 @@ enum var_type
    DOUBLE,
    STRING,
    DATA,
-   COMMAND // TODO: rename var_type -> type (merge var and command types)
+   COMMAND
 };
 
-struct var_type_description_t
-{
-   enum var_type type;
-   char *description;
-};
-
-struct plugin_var_table
+struct plugin_properties
 {
    const char *name;
-   const enum var_type type;
+   const enum property_type type;
    const char *description;
+   int (*function)(void);
    void *data;
 };
 
@@ -79,8 +67,7 @@ struct plugin
    int (*get)(void);
    int (*set)(void);
    int (*init)(void);
-   struct plugin_command_table *commands;
-   struct plugin_var_table *vars;
+   struct plugin_properties *properties;
 };
 
 void register_plugin(struct plugin *plugin);

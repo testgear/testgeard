@@ -3,7 +3,7 @@
  *
  * For WAV file playback libaudiofile is used for parsing the WAV file.
  *
- * Copyright (c) 2012-2013, Martin Lund
+ * Copyright (c) 2012-2014, Martin Lund
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -284,24 +284,8 @@ static int audio_generate_tone(void)
     return 0;
 }
 
-
-// Plugin commands
-static struct plugin_command_table audio_commands[] =
-{
-    {   .name = "generate-tone",
-        .function = audio_generate_tone,
-        .description = "Generate sine tone" },
-
-    {   .name = "play-wav",
-        .function = audio_play_wav,
-        .description = "Generate wav file" },
-
-    { }
-};
-
-
-// Plugin variables
-static struct plugin_var_table audio_vars[] =
+// Plugin properties
+static struct plugin_properties audio_properties[] =
 {
     {   .name = "device",
         .type = STRING,
@@ -331,9 +315,18 @@ static struct plugin_var_table audio_vars[] =
         .type = STRING,
         .description = "WAV file for playback" },
 
+    {   .name = "generate-tone",
+        .type = COMMAND,
+        .function = audio_generate_tone,
+        .description = "Generate sine tone" },
+
+    {   .name = "play-wav",
+        .type = COMMAND,
+        .function = audio_play_wav,
+        .description = "Generate wav file" },
+
     { }
 };
-
 
 // Plugin configuration
 struct plugin audio =
@@ -343,10 +336,8 @@ struct plugin audio =
     .description = "Audio plugin",
     .author = "Martin Lund",
     .license = "BSD-3",
-    .commands = audio_commands,
-    .vars = audio_vars,
+    .properties = audio_properties,
     .load = audio_load,
 };
-
 
 plugin_register(audio);
