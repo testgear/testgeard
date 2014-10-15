@@ -15,6 +15,7 @@ testgeard_CFLAGS = -DSERVER
 testgeard_LDADD = -ldl
 
 plugin_la_SOURCES = plugin.c
+plugin_la_CFLAGS = -fPIC
 plugin_la_LDFLAGS = -module -avoid-version -export-dynamic
 
 bashcompletiondir=$(sysconfdir)/bash_completion.d
