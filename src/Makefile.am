@@ -1,6 +1,7 @@
 sbin_PROGRAMS = testgeard
-pkglib_LIBRARIES = libplugin.a
+pkglib_LTLIBRARIES = plugin.la
 pkginclude_HEADERS = include/testgear/plugin.h
+
 testgeard_SOURCES = connection-manager.c \
                     list.c \
                     main.c \
@@ -12,7 +13,9 @@ testgeard_SOURCES = connection-manager.c \
                     tcp.c
 testgeard_CFLAGS = -DSERVER
 testgeard_LDADD = -ldl
-libplugin_a_SOURCES = plugin.c
+
+plugin_la_SOURCES = plugin.c
+plugin_la_LDFLAGS = -module -avoid-version -export-dynamic
 
 bashcompletiondir=$(sysconfdir)/bash_completion.d
 dist_bashcompletion_DATA=bash-completion/testgeard
