@@ -1,6 +1,7 @@
 sbin_PROGRAMS = testgeard
 pkglib_LTLIBRARIES = plugin.la
-pkginclude_HEADERS = include/testgear/plugin.h
+testgearddir = $(includedir)/testgear
+testgeard_HEADERS = include/testgear/plugin.h
 
 testgeard_SOURCES = connection-manager.c \
                     list.c \
