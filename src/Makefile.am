@@ -12,7 +12,7 @@ testgeard_SOURCES = connection-manager.c \
                     log.c \
                     message.c \
                     tcp.c
-testgeard_CFLAGS = -DSERVER
+testgeard_CFLAGS = -DSERVER -DPLUGINDIR=\"$(libdir)/testgear-plugins\"
 testgeard_LDADD = -ldl
 
 plugin_la_SOURCES = plugin.c

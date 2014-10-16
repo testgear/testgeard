@@ -84,7 +84,7 @@ int list_plugins(char *plugins)
     FILE *fp;
     char line_buffer[256];
 
-    fp = popen("cd plugins; ls *.so", "r");
+    fp = popen("cd " PLUGINDIR "; ls *.so", "r");
     if (fp == NULL)
     {
          printf("Error: %s\n", strerror(errno));
@@ -133,7 +133,7 @@ int plugin_load(char *name)
     }
 
     // Add location
-    sprintf(filename, "./plugins/%s.so", name);
+    sprintf(filename, PLUGINDIR "/%s.so", name);
 
     // Open plugin
     plugin_item.handle = dlopen(filename, RTLD_LAZY);
