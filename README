@@ -8,7 +8,7 @@
     handles incoming requests to load/unload test plugins, query/manage various
     test variables, and run test commands.
 
-    Each test plugin offers various variables (parameters) and commands
+    Each test plugin offers various parameters (variables) and commands
     (functions) which can be queried or fired from the Test Gear client.
 
     It is part of the Test Gear project which aims to create a simple hardware
