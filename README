@@ -17,7 +17,7 @@
 
 2. Status
 
-    The code is currently considered highly experimental. API and internals are
+    The code is currently considered experimental. API and internals are
     subject to change. Use on your own risk. For now, consider it a playground
     for experiments.
 
