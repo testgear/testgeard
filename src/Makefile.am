@@ -11,7 +11,18 @@ testgeard_SOURCES = connection-manager.c \
                     daemon.c \
                     log.c \
                     message.c \
-                    tcp.c
+                    tcp.c \
+                    include/testgear/list.h \
+                    include/testgear/tcp.h \
+                    include/testgear/daemon.h \
+                    include/testgear/connection-manager.h \
+                    include/testgear/signal.h \
+                    include/testgear/debug.h \
+                    include/testgear/options.h \
+                    include/testgear/plugin.h \
+                    include/testgear/plugin-manager.h \
+                    include/testgear/message.h
+
 testgeard_CFLAGS = -DSERVER -DPLUGINDIR=\"$(libdir)/testgear-plugins\"
 testgeard_LDADD = -ldl
 

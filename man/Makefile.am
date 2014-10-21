@@ -1,1 +1,1 @@
-man_MANS = testgeard.1
+dist_man_MANS = testgeard.1
