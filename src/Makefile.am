@@ -23,7 +23,8 @@ testgeard_SOURCES = connection-manager.c \
                     include/testgear/plugin-manager.h \
                     include/testgear/message.h
 
-testgeard_CFLAGS = -DSERVER -DPLUGINDIR=\"$(libdir)/testgear-plugins\"
+testgeard_CFLAGS = -DSERVER -DPLUGINDIR=\"$(libdir)/testgear-plugins\" \
+                            -DLOGDIR=\"$(localstatedir)/log/testgeard\"
 testgeard_LDADD = -ldl
 
 plugin_la_SOURCES = plugin.c

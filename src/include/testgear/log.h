@@ -28,53 +28,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef LOG_H
+#define LOG_H
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include "config.h"
-#include "testgear/options.h"
-#include "testgear/debug.h"
-#include "testgear/daemon.h"
-#include "testgear/plugin-manager.h"
-#include "testgear/connection-manager.h"
-#include "testgear/log.h"
 
-void sigint_handler(int signal)
-{
-    exit(0);
-}
+#define log_info(format, args...) \
+    fprintf (log_file, "" format, ## args)
 
-void exit_handler(void)
-{
-    // Shut down log
-    log_exit();
-}
+#define log_error(format, args...) \
+    fprintf (log_file, "Error: " format, ## args)
 
-int main(int argc, char *argv[])
-{
-    // Initialize log
-    log_init();
+extern FILE *log_file;
 
-    // Register exit and ctrl-c handler
-    atexit(&exit_handler);
-    signal(SIGINT, sigint_handler);
+void log_init(void);
+void log_exit(void);
 
-    log_info("%s v%s\n", PACKAGE_NAME, PACKAGE_VERSION);
-
-    // Parse options
-    parse_options(argc, argv);
-
-    // Daemonize if requested
-    if (option.daemon)
-        daemonize();
-
-    // Start plugin manager
-    plugin_manager_start();
-
-    // Start connection manager
-    connection_manager_start();
-
-    // Never reached
-
-    return 0;
-}
+#endif
