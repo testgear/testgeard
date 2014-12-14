@@ -33,15 +33,15 @@
 
 #include <stdio.h>
 
-#define log_info(format, args...) \
-    fprintf (log_file, "" format, ## args)
-
-#define log_error(format, args...) \
-    fprintf (log_file, "Error: " format, ## args)
+#ifdef SERVER
 
 extern FILE *log_file;
 
 void log_init(void);
 void log_exit(void);
+void log_info(const char *format, ...);
+void log_error(const char *format, ...);
+
+#endif
 
 #endif

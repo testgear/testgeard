@@ -37,8 +37,11 @@
 #include "testgear/plugin.h"
 #include "testgear/debug.h"
 #include "testgear/list.h"
+#include "testgear/log.h"
 
-list_p plugin_list;
+static struct init_data data;
+
+static list_p plugin_list;
 
 struct plugin_item_t
 {
@@ -46,37 +49,34 @@ struct plugin_item_t
     void *handle;
 };
 
-struct plugin_item_t plugin_item;
-struct plugin_item_t *plugin_item_p;
+static struct plugin_item_t plugin_item;
+static struct plugin_item_t *plugin_item_p;
 
 static void plugin_print_info(struct plugin *plugin)
 {
     int i;
 
     // Print plugin information
-    debug_printf("\n");
-    debug_printf("Plugin information\n");
-    debug_printf("------------------\n");
-    debug_printf(" Name: %s\n", plugin->name);
-    debug_printf(" Version: %s\n", plugin->version);
-    debug_printf(" Description: %s\n", plugin->description);
-    debug_printf(" Author: %s\n", plugin->author);
-    debug_printf(" License: %s\n", plugin->license);
-    debug_printf(" Commands: ");
+    log_info("");
+    log_info("Plugin information");
+    log_info("------------------");
+    log_info(" Name: %s", plugin->name);
+    log_info(" Version: %s", plugin->version);
+    log_info(" Description: %s", plugin->description);
+    log_info(" Author: %s", plugin->author);
+    log_info(" License: %s", plugin->license);
+    log_info(" Commands: ");
     for (i=0; plugin->properties[i].name; i++)
     {
         if (plugin->properties[i].type == COMMAND)
-            debug_printf_raw("%s ", plugin->properties[i].name);
+            log_info("   %s ", plugin->properties[i].name);
     }
-    debug_printf_raw("\n");
-    debug_printf(" Variables: ");
+    log_info(" Variables: ");
     for (i=0; plugin->properties[i].name; i++)
     {
         if (plugin->properties[i].type != COMMAND)
-            debug_printf_raw("%s ", plugin->properties[i].name);
+            log_info("   %s ", plugin->properties[i].name);
     }
-    debug_printf_raw("\n");
-    debug_printf("\n");
 }
 
 int list_plugins(char *plugins)
@@ -115,7 +115,7 @@ int plugin_load(char *name)
     struct plugin_command_table *commands;
     char *error;
 
-    debug_printf("Loading plugin %s\n", name);
+    log_info("Loading %s plugin", name);
 
     // Fill in name in list element
     strcpy(plugin_item.name, name);
@@ -127,7 +127,7 @@ int plugin_load(char *name)
         plugin_item_p = (struct plugin_item_t *)list_current(iter);
         if (strcmp(plugin_item_p->name, name) == 0)
         {
-            printf("Error: Plugin already loaded!\n");
+            log_error("Plugin already loaded!");
             return -1;
         }
     }
@@ -153,8 +153,9 @@ int plugin_load(char *name)
             fprintf(stderr, "%s\n", error);
         plugin = (*plugin_register)();
 
-        // Initialize plugin variabes
-        plugin->init();
+        // Initialize plugin
+        data.log_file = log_file;
+        plugin->init(&data);
 
         // Print plugin information
         plugin_print_info(plugin);

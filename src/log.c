@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <pthread.h>
 #include <sys/stat.h>
@@ -93,4 +94,23 @@ void log_exit(void)
         if (status != 0)
             fprintf(stderr, "Error: Could not close log file (%s)\n", strerror(errno));
     }
+}
+
+void log_info(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(log_file, format, args);
+    va_end(args);
+    fprintf(log_file, "\n");
+}
+
+void log_error(const char *format, ...)
+{
+    va_list args;
+    fprintf(log_file, "Error: ");
+    va_start(args, format);
+    vfprintf(log_file, format, args);
+    va_end(args);
+    fprintf(log_file, "\n");
 }

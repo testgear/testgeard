@@ -30,11 +30,33 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include "testgear/plugin.h"
 
 static struct plugin *plugin;
 static struct plugin_properties *property;
+static FILE *log_file;
+
+void log_info(const char *format, ...)
+{
+    va_list args;
+    fprintf(log_file, "[%s] ", plugin->name);
+    va_start(args, format);
+    vfprintf(log_file, format, args);
+    va_end(args);
+    fprintf(log_file, "\n");
+}
+
+void log_error(const char *format, ...)
+{
+    va_list args;
+    fprintf(log_file, "[%s] Error: ", plugin->name);
+    va_start(args, format);
+    vfprintf(log_file, format, args);
+    va_end(args);
+    fprintf(log_file, "\n");
+}
 
 static void verify_properties(struct plugin_properties *property)
 {
@@ -101,8 +123,9 @@ static void initialize_properties(struct plugin_properties *property)
     }
 }
 
-int init(void)
+int init(struct init_data *data)
 {
+    log_file = data->log_file;
     verify_properties(plugin->properties);
     initialize_properties(plugin->properties);
     return 0;

@@ -33,6 +33,11 @@
 
 #include <stdbool.h>
 
+struct init_data
+{
+    FILE *log_file;
+};
+
 enum property_type
 {
    CHAR,
@@ -66,7 +71,7 @@ struct plugin
    int (*unload)(void);
    int (*get)(void);
    int (*set)(void);
-   int (*init)(void);
+   int (*init)(struct init_data *data);
    struct plugin_properties *properties;
 };
 
@@ -93,5 +98,8 @@ float  get_float(char *name);
 double get_double(char *name);
 char * get_string(char *name);
 void * get_data(void *name);
+
+void log_info(const char *format, ...);
+void log_error(const char *format, ...);
 
 #endif
