@@ -212,7 +212,7 @@ int get__char(char *name, char *value)
         return 0;
     }
 
-    printf("Warning: Variable %s not found\n", name);
+    log_error("Variable %s not found\n", name);
     return -1;
 }
 
@@ -247,7 +247,7 @@ int get__short(char *name, short *value)
         return 0;
     }
 
-    printf("Warning: Variable %s not found\n", name);
+    log_error("Variable %s not found\n", name);
     return -1;
 }
 
@@ -282,7 +282,7 @@ int get__int(char *name, int *value)
         return 0;
     }
 
-    printf("Warning: Variable %s not found\n", name);
+    log_error("Variable %s not found\n", name);
     return -1;
 }
 
@@ -317,7 +317,7 @@ int get__long(char *name, long *value)
         return 0;
     }
 
-    printf("Warning: Variable %s not found\n", name);
+    log_error("Variable %s not found\n", name);
     return -1;
 }
 
@@ -352,7 +352,7 @@ int get__float(char *name, float *value)
         return 0;
     }
 
-    printf("Warning: Variable %s not found\n", name);
+    log_error("Variable %s not found\n", name);
     return -1;
 }
 
@@ -387,7 +387,7 @@ int get__double(char *name, double *value)
         return 0;
     }
 
-    printf("Warning: Variable %s not found\n", name);
+    log_error("Variable %s not found\n", name);
     return -1;
 }
 
@@ -481,7 +481,7 @@ int run(char *command_name, int *return_value)
         return 0;
     }
 
-    printf("Warning: Command %s not found\n", command_name);
+    log_error("Command %s not found\n", command_name);
     return -1;
 }
 
