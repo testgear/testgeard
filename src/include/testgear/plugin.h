@@ -57,6 +57,8 @@ struct plugin_properties
    const enum property_type type;
    const char *description;
    int (*function)(void);
+   int (*get)(void);
+   int (*set)(void);
    void *data;
 };
 
@@ -69,8 +71,6 @@ struct plugin
    const char *license;
    int (*load)(void);
    int (*unload)(void);
-   int (*get)(void);
-   int (*set)(void);
    int (*init)(struct init_data *data);
    struct plugin_properties *properties;
 };

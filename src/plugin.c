@@ -203,13 +203,33 @@ static int find_property(char *name, int type)
     return -1;
 }
 
+static int get(int index)
+{
+    if (property[index].get != NULL)
+    {
+        if (property[index].get() != 0)
+            return -1;
+    }
+    return 0;
+}
+
+static int set(int index)
+{
+    if (property[index].set != NULL)
+    {
+        if (property[index].set() != 0)
+            return -1;
+    }
+    return 0;
+}
+
 int get__char(char *name, char *value)
 {
     int i = find_property(name, CHAR);
     if (i >= 0)
     {
         *value = *((char *)property[i].data);
-        return 0;
+        return get(i);
     }
 
     log_error("Variable %s not found\n", name);
@@ -232,7 +252,7 @@ int set_char(char *name, char value)
     if (i >= 0)
     {
         *((char *)property[i].data) = value;
-        return 0;
+        return set(i);
     }
 
     return -1;
@@ -244,7 +264,7 @@ int get__short(char *name, short *value)
     if (i >= 0)
     {
         *value = *((short *)property[i].data);
-        return 0;
+        return get(i);
     }
 
     log_error("Variable %s not found\n", name);
@@ -267,7 +287,7 @@ int set_short(char *name, short value)
     if (i >= 0)
     {
         *((short *)property[i].data) = value;
-        return 0;
+        return set(i);
     }
 
     return -1;
@@ -279,7 +299,7 @@ int get__int(char *name, int *value)
     if (i >= 0)
     {
         *value = *((int *)property[i].data);
-        return 0;
+        return get(i);
     }
 
     log_error("Variable %s not found\n", name);
@@ -302,7 +322,7 @@ int set_int(char *name, int value)
     if (i >= 0)
     {
         *((int *)property[i].data) = value;
-        return 0;
+        return set(i);
     }
 
     return -1;
@@ -314,7 +334,7 @@ int get__long(char *name, long *value)
     if (i >= 0)
     {
         *value = *((long *)property[i].data);
-        return 0;
+        return get(i);
     }
 
     log_error("Variable %s not found\n", name);
@@ -337,7 +357,7 @@ int set_long(char *name, long value)
     if (i >= 0)
     {
         *((long *)property[i].data) = value;
-        return 0;
+        return set(i);
     }
 
     return -1;
@@ -349,7 +369,7 @@ int get__float(char *name, float *value)
     if (i >= 0)
     {
         *value = *((float *)property[i].data);
-        return 0;
+        return get(i);
     }
 
     log_error("Variable %s not found\n", name);
@@ -372,7 +392,7 @@ int set_float(char *name, float value)
     if (i >= 0)
     {
         *((float *)property[i].data) = value;
-        return 0;
+        return set(i);
     }
 
     return -1;
@@ -384,7 +404,7 @@ int get__double(char *name, double *value)
     if (i >= 0)
     {
         *value = *((double *)property[i].data);
-        return 0;
+        return get(i);
     }
 
     log_error("Variable %s not found\n", name);
@@ -407,7 +427,7 @@ int set_double(char *name, double value)
     if (i >= 0)
     {
         *((double *)property[i].data) = value;
-        return 0;
+        return set(i);
     }
 
     return -1;
