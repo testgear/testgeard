@@ -99,6 +99,7 @@ void log_exit(void)
 void log_info(const char *format, ...)
 {
     va_list args;
+    fprintf(log_file, "[testgeard] ");
     va_start(args, format);
     vfprintf(log_file, format, args);
     va_end(args);
@@ -108,7 +109,7 @@ void log_info(const char *format, ...)
 void log_error(const char *format, ...)
 {
     va_list args;
-    fprintf(log_file, "Error: ");
+    fprintf(log_file, "[testgeard] Error: ");
     va_start(args, format);
     vfprintf(log_file, format, args);
     va_end(args);
