@@ -106,6 +106,16 @@ void log_info(const char *format, ...)
     fprintf(log_file, "\n");
 }
 
+void log_warning(const char *format, ...)
+{
+    va_list args;
+    fprintf(log_file, "[testgeard] Warning: ");
+    va_start(args, format);
+    vfprintf(log_file, format, args);
+    va_end(args);
+    fprintf(log_file, "\n");
+}
+
 void log_error(const char *format, ...)
 {
     va_list args;
