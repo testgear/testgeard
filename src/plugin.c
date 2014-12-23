@@ -81,7 +81,7 @@ static void verify_properties(struct plugin_properties *property)
             if (i != j)
             {
                 if (strcmp(property[i].name, property[j].name) == 0)
-                    printf("Warning: Duplicate property name found! (%s)\n", property[i].name);
+                    log_warning("Duplicate property name found! (%s)\n", property[i].name);
             }
         }
     }
@@ -191,7 +191,7 @@ static int find_property(char *name, int type)
                 // Check matching type
                 if (property[i].type != type)
                 {
-                    printf("Warning: Property %s has different type\n", property[i].name);
+                    log_warning("Property %s has different type\n", property[i].name);
                     return -1;
                 }
             }
@@ -199,7 +199,7 @@ static int find_property(char *name, int type)
         }
     }
 
-    printf("Warning: Property %s not found\n", name);
+    log_error("Property %s not found\n", name);
     return -1;
 }
 
